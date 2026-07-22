@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Dental Note Builder — Dashboard</title>
+<style>
+  :root {
+    --bg: #e9e9e7;
+    --card: #ffffff;
+    --accent: #0f6e56;
+    --accent-light: #e6f4f0;
+    --text: #1d2b36;
+    --text-muted: #5f6b76;
+    --border: #dcdfe3;
+    --radius: 14px;
+
+    --c-general:     #0f6e56;
+    --c-general-bg:  #e6f4f0;
+    --c-perio:       #1a6fa8;
+    --c-perio-bg:    #e6f1fa;
+    --c-restorative: #7a4fa0;
+    --c-restorative-bg: #f2edf8;
+    --c-surgical:    #b04f00;
+    --c-surgical-bg: #fdf0e6;
+    --c-implant:     #5a6e00;
+    --c-implant-bg:  #f2f5e6;
+    --c-invisalign:  #0060a8;
+    --c-invisalign-bg: #e6eef8;
+    --c-other:       #6b5a3e;
+    --c-other-bg:    #f5f0ea;
+  }
+
+  * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+    color: var(--text);
+  }
+
+  .header {
+    max-width: 1000px;
+    margin: 0 auto 36px;
+  }
+  .header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .header p {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-muted);
+  }
+
+  .dashboard {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .group-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: 0 0 12px;
+  }
+
+  .group-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .template-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    text-decoration: none;
+    color: var(--text);
+    border: 1.5px solid var(--border);
+    transition: box-shadow 0.15s, border-color 0.15s, transform 0.1s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .template-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--chip-color);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .template-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    border-color: var(--chip-color);
+    transform: translateY(-2px);
+  }
+
+  .template-card.ready .card-name {
+    color: var(--text);
+  }
+  .template-card.pending {
+    opacity: 0.55;
+    cursor: default;
+    pointer-events: none;
+  }
+  .template-card.pending .card-name {
+    color: var(--text-muted);
+  }
+
+  .card-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--chip-color);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .card-name {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    width: fit-content;
+    margin-top: 2px;
+  }
+  .badge-ready {
+    background: var(--c-general-bg);
+    color: var(--c-general);
+  }
+  .badge-pending {
+    background: #f0f0f0;
+    color: #999;
+  }
+
+  .legend {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 8px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Dental Note Builder</h1>
+  <p>Select a template to open the note builder for that appointment type.</p>
+</div>
+
+<div class="dashboard">
+
+  <!-- GROUP 1: General / Exams -->
+  <div>
+    <div class="group-title">General &amp; Exams</div>
+    <div class="group-cards">
+
+      <a class="template-card ready" href="01_checkin_note.html" style="--chip-color: var(--c-general);">
+        <span class="card-num">#1</span>
+        <span class="card-name">Check-in Note</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="02_comprehensive_exam.html" style="--chip-color: var(--c-general);">
+        <span class="card-num">#2</span>
+        <span class="card-name">Comprehensive Exam and Cleaning</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="03_child_exam.html" style="--chip-color: var(--c-general);">
+        <span class="card-num">#3</span>
+        <span class="card-name">Child Exam Initial/Recall</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="04_recall_exam.html" style="--chip-color: var(--c-general);">
+        <span class="card-num">#4</span>
+        <span class="card-name">Recall Exam and Cleaning</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="05_limited_exam.html" style="--chip-color: var(--c-general);">
+        <span class="card-num">#5</span>
+        <span class="card-name">Limited Exam</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- GROUP 2: Perio / Hygiene -->
+  <div>
+    <div class="group-title">Periodontics &amp; Hygiene</div>
+    <div class="group-cards">
+
+      <a class="template-card ready" href="06_prophy_scaling.html" style="--chip-color: var(--c-perio);">
+        <span class="card-num">#6</span>
+        <span class="card-name">Prophy / Scaling</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="07_fissure_sealant_prr.html" style="--chip-color: var(--c-perio);">
+        <span class="card-num">#7</span>
+        <span class="card-name">Fissure Sealants / PRR</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="08_srp_pm.html" style="--chip-color: var(--c-perio);">
+        <span class="card-num">#8</span>
+        <span class="card-name">SRP / PM</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- GROUP 3: Restorative -->
+  <div>
+    <div class="group-title">Restorative</div>
+    <div class="group-cards">
+
+      <a class="template-card ready" href="09_direct_composite.html" style="--chip-color: var(--c-restorative);">
+        <span class="card-num">#9</span>
+        <span class="card-name">Direct Composite Restoration</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="10_crown_onlay_prep.html" style="--chip-color: var(--c-restorative);">
+        <span class="card-num">#10</span>
+        <span class="card-name">Crown / Onlay Prep</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="11_crown_onlay_delivery.html" style="--chip-color: var(--c-restorative);">
+        <span class="card-num">#11</span>
+        <span class="card-name">Crown / Onlay Delivery</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- GROUP 4: Surgical -->
+  <div>
+    <div class="group-title">Surgical</div>
+    <div class="group-cards">
+
+      <a class="template-card ready" href="12_extraction.html" style="--chip-color: var(--c-surgical);">
+        <span class="card-num">#12</span>
+        <span class="card-name">Extraction</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="13_bone_grafting.html" style="--chip-color: var(--c-surgical);">
+        <span class="card-num">#13</span>
+        <span class="card-name">Bone Grafting</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- GROUP 5: Implants -->
+  <div>
+    <div class="group-title">Implants</div>
+    <div class="group-cards">
+
+      <a class="template-card ready" href="14_implant_consultation.html" style="--chip-color: var(--c-implant);">
+        <span class="card-num">#14</span>
+        <span class="card-name">Implant (Pre-op)</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="15_implant_placement.html" style="--chip-color: var(--c-implant);">
+        <span class="card-num">#15</span>
+        <span class="card-name">Implant (Surgery / Post-op)</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="16_implant_restoration.html" style="--chip-color: var(--c-implant);">
+        <span class="card-num">#16</span>
+        <span class="card-name">Implant Crown Impression / Delivery</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- GROUP 6: Invisalign -->
+  <div>
+    <div class="group-title">Invisalign</div>
+    <div class="group-cards">
+
+      <a class="template-card ready" href="17_invisalign_consultation.html" style="--chip-color: var(--c-invisalign);">
+        <span class="card-num">#17</span>
+        <span class="card-name">Invisalign Consultation</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="18_invisalign_data_collection.html" style="--chip-color: var(--c-invisalign);">
+        <span class="card-num">#18</span>
+        <span class="card-name">Invisalign Data Collection and Assessment</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="19_invisalign_initial_fit.html" style="--chip-color: var(--c-invisalign);">
+        <span class="card-num">#19</span>
+        <span class="card-name">Initial Invisalign Fit</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="20_invisalign_followup.html" style="--chip-color: var(--c-invisalign);">
+        <span class="card-num">#20</span>
+        <span class="card-name">Invisalign Follow-up Review</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="21_invisalign_debonding.html" style="--chip-color: var(--c-invisalign);">
+        <span class="card-num">#21</span>
+        <span class="card-name">Invisalign Debonding</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="22_invisalign_retainer_delivery.html" style="--chip-color: var(--c-invisalign);">
+        <span class="card-num">#22</span>
+        <span class="card-name">Invisalign Retainer Delivery</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- GROUP 7: Other -->
+  <div>
+    <div class="group-title">Other</div>
+    <div class="group-cards">
+
+      <a class="template-card ready" href="23_tmj_occlusal_splint.html" style="--chip-color: var(--c-other);">
+        <span class="card-num">#23</span>
+        <span class="card-name">TMJ / Night Guard Splint</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+      <a class="template-card ready" href="24_prescription.html" style="--chip-color: var(--c-other);">
+        <span class="card-num">#24</span>
+        <span class="card-name">Prescription</span>
+        <span class="card-badge badge-ready">✓ Ready</span>
+      </a>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

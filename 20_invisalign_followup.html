@@ -1,0 +1,2108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>#20 Invisalign Follow-up / Review — Dental Note Builder</title>
+<style>
+  :root {
+    --bg-page: #e9e9e7;
+    --bg-card: #ffffff;
+    --bg-pill: #eef1fb;
+    --bg-pill-hover: #e2e7fa;
+    --bg-pill-active: #cfe8de;
+    --text-main: #1d2b36;
+    --text-muted: #5f6b76;
+    --accent: #0f6e56;
+    --border: #dcdfe3;
+    --danger: #c0392b;
+  }
+  * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  body {
+    margin: 0;
+    background: var(--bg-page);
+    padding: 0 0 80px;
+    color: var(--text-main);
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 28px 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .card.section-skipped {
+    display: none;
+  }
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+  .card h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  .section-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .skip-section-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .skip-section-btn:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .intro-text {
+    font-size: 15px;
+    color: var(--text-main);
+    margin: 0 0 18px 0;
+    line-height: 1.5;
+  }
+  .line {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .line:last-of-type {
+    border-bottom: none;
+  }
+  .line-content {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+  }
+  .line-label {
+    font-weight: 700;
+    white-space: nowrap;
+    margin-right: 2px;
+  }
+  .remove-btn {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    margin-top: 2px;
+  }
+  .remove-btn:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .pill {
+    background: var(--bg-pill);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.15s ease;
+    white-space: nowrap;
+  }
+  .pill:hover {
+    background: var(--bg-pill-hover);
+  }
+  .pill.active {
+    background: var(--bg-pill-active);
+    font-weight: 600;
+  }
+  select {
+    background: var(--bg-pill);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: var(--text-main);
+    cursor: pointer;
+    min-width: 180px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230f6e56' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  select.wide {
+    min-width: 320px;
+    max-width: 100%;
+  }
+  input[type="text"] {
+    border: none;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    font-size: 14px;
+    padding: 6px 4px;
+    color: var(--text-main);
+    outline: none;
+    min-width: 60px;
+  }
+  input[type="text"]::placeholder {
+    color: #aab2ba;
+  }
+  input[type="text"].small {
+    width: 70px;
+  }
+  input[type="text"].medium {
+    width: 100px;
+  }
+  input[type="text"].grow {
+    flex: 1;
+    min-width: 150px;
+  }
+  .static-text {
+    font-size: 14px;
+    color: var(--text-main);
+  }
+  .add-line-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px 0 0 0;
+  }
+  .add-line-btn:hover {
+    text-decoration: underline;
+  }
+  .add-line-btn:disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+    text-decoration: none;
+  }
+  .icon-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .add-line-btn:disabled .icon-circle {
+    border-color: var(--text-muted);
+  }
+
+  /* discussion sub-blocks */
+  .discussion-block {
+    border-left: 3px solid var(--bg-pill-active);
+    padding: 10px 0 10px 14px;
+    margin: 10px 0;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .discussion-block .diag-tag {
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  /* Note output */
+  .note-output {
+    background: #f4f6f5;
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-main);
+    min-height: 24px;
+    white-space: pre-wrap;
+  }
+  .note-output-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .action-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .action-btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .action-btn:hover {
+    opacity: 0.85;
+  }
+
+  /* Modal for multi-select */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  .modal-overlay.open {
+    display: flex;
+  }
+  .modal-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  .modal-box h3 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .modal-subtitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin: 16px 0 12px 0;
+  }
+  .modal-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .modal-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-pill);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text-main);
+  }
+  .modal-option.selected {
+    background: var(--bg-pill-active);
+    font-weight: 600;
+  }
+  .modal-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-add-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .modal-add-btn:disabled {
+    background: #c7ccd1;
+    cursor: not-allowed;
+  }
+
+  /* skipped sections tray */
+  .skipped-tray {
+    background: var(--bg-card);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    padding: 16px 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .skipped-tray.empty {
+    display: none;
+  }
+  .skipped-tray-title {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-main);
+  }
+  .restore-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-pill);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: var(--text-main);
+    cursor: pointer;
+    margin: 0 8px 8px 0;
+  }
+  .restore-pill:hover {
+    background: var(--bg-pill-hover);
+  }
+  /* ---- Sticky section nav footer ---- */
+  .section-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0f6e56;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    z-index: 500;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
+  }
+  .section-footer::-webkit-scrollbar { display: none; }
+  .footer-link {
+    flex-shrink: 0;
+    padding: 13px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    cursor: pointer;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    border-bottom: 3px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .footer-link:hover {
+    color: #ffffff;
+    background: rgba(255,255,255,0.08);
+  }
+  .footer-link.active {
+    color: #ffffff;
+    border-bottom-color: #ffffff;
+  }
+  .footer-link.skipped {
+    opacity: 0.35;
+    text-decoration: line-through;
+  }
+  /* top bar */
+  .top-bar {
+    background: var(--accent);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 600;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .top-bar-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 5px 12px;
+    transition: background 0.15s;
+  }
+  .top-bar-back:hover { background: rgba(255,255,255,0.12); color: #fff; }
+  .top-bar-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0; }
+  .top-bar-num {
+    font-size: 12px; font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.12);
+    border-radius: 20px; padding: 2px 10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="top-bar-back" href="index.html">← Dashboard</a>
+  <span class="top-bar-num">#20</span>
+  <h1 class="top-bar-title">Invisalign Follow-up / Review</h1>
+</div>
+
+<div class="container" id="container" style="padding: 28px 24px 0;">
+  <!-- Sections render here -->
+</div>
+
+<div class="skipped-tray empty" id="skipped-tray" style="max-width:960px; margin: 16px auto 0; padding: 0 24px;">
+  <div class="skipped-tray-title">Skipped sections</div>
+  <div id="skipped-list"></div>
+</div>
+
+<div class="container" style="margin-top:24px; padding: 0 24px 0;">
+  <div class="card">
+    <div class="note-output-label">Generated note</div>
+    <div class="note-output" id="note-output"></div>
+    <div class="actions-row">
+      <button class="action-btn" id="copy-btn">Copy notes</button>
+      <button class="action-btn secondary" id="reset-btn">Reset</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="select-modal">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <h3 id="modal-title">Select options</h3>
+    <div class="modal-subtitle">Multi-select</div>
+    <div class="modal-options" id="modal-options"></div>
+    <button class="modal-add-btn" id="modal-add-btn">Add to line</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CHILD EXAM INITIAL/RECALL — DATA
+============================================================ */
+
+const SECTIONS = [
+
+/* ============================================================
+   1. INVISALIGN FOLLOW-UP / REVIEW
+============================================================ */
+{
+  id: 'checkin',
+  title: 'Invisalign Follow-up / Review',
+  intro: null,
+  lines: [
+    {
+      id: 'room',
+      type: 'dropdown',
+      label: 'Patient seated in the Room:',
+      options: ['1', '2', '3', '5'],
+      noteTemplate: (state, ls) => ls.value ? 'Patient seated in room ' + ls.value + '.' : null
+    },
+    {
+      id: 'rmh',
+      type: 'buttonGroupOther',
+      label: 'RMH:',
+      options: ['No changes', 'Other'],
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        const str = ls.value === 'Other'
+          ? (ls.otherText && ls.otherText.trim() ? ls.otherText.trim() : '___')
+          : ls.value;
+        return 'RMH: ' + str + '.';
+      }
+    },
+    {
+      id: 'issuesReported',
+      type: 'buttonGroupOther',
+      label: 'Issues reported by patient:',
+      options: ['None', 'Other'],
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'None') return 'Issues reported by patient: none.';
+        return (ls.otherText && ls.otherText.trim())
+          ? 'Issues reported by patient: ' + ls.otherText.trim() + '.'
+          : null;
+      }
+    },
+    {
+      id: 'alignersPassive',
+      type: 'buttonGroup',
+      label: 'Aligners becoming passive after prescribed time with no gaps?:',
+      options: ['Yes', 'No'],
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        return ls.value === 'Yes'
+          ? 'Aligners becoming passive after prescribed time with no gaps: yes.'
+          : 'Aligners becoming passive after prescribed time with no gaps: no.';
+      }
+    },
+    {
+      id: 'teethTracking',
+      type: 'buttonGroup',
+      label: 'Teeth tracking well:',
+      options: ['Yes', 'No'],
+      noteTemplate: (state, ls) => ls.value ? 'Teeth tracking well: ' + ls.value.toLowerCase() + '.' : null
+    },
+    {
+      id: 'trackingAdvice',
+      type: 'compound',
+      label: '',
+      hideLabel: true,
+      parts: [
+        { kind: 'static', text: 'Advised pt that their teeth are not following the prescribed movements accurately. This is commonly associated with lack of wear or insufficient force on the teeth from the aligners.' }
+      ],
+      noteTemplate: (state, ls) => {
+        const t = state.sections.checkin.lines.teethTracking;
+        if (!t || !t.exists || t.value !== 'No') return null;
+        return 'Advised pt that their teeth are not following the prescribed movements accurately. This is commonly associated with lack of wear or insufficient force on the teeth from the aligners.';
+      }
+    },
+    {
+      id: 'trackingNewAligners',
+      type: 'compound',
+      label: '',
+      hideLabel: true,
+      parts: [
+        { kind: 'static', text: 'Advised pt that new aligners will be needed to bring the teeth back on track. Explained pt that there is' },
+        { kind: 'pills', key: 'charge', options: ['no charge', 'a certain charge presented'] },
+        { kind: 'static', text: 'for this order.' }
+      ],
+      noteTemplate: (state, ls) => {
+        const t = state.sections.checkin.lines.teethTracking;
+        if (!t || !t.exists || t.value !== 'No') return null;
+        let s = 'Advised pt that new aligners will be needed to bring the teeth back on track.';
+        if (ls.charge) s += ' Explained pt that there is ' + ls.charge + ' for this order.';
+        return s;
+      }
+    },
+    {
+      id: 'trackingRecords',
+      type: 'compound',
+      label: '',
+      hideLabel: true,
+      parts: [
+        { kind: 'static', text: 'New' },
+        { kind: 'pills', key: 'records', options: ['Impressions', 'Scan'] },
+        { kind: 'static', text: 'and photos taken' }
+      ],
+      noteTemplate: (state, ls) => {
+        const t = state.sections.checkin.lines.teethTracking;
+        if (!t || !t.exists || t.value !== 'No') return null;
+        if (!ls.records) return null;
+        return 'New ' + ls.records.toLowerCase() + ' and photos taken.';
+      }
+    },
+    {
+      id: 'trackingRetainer',
+      type: 'compound',
+      label: '',
+      hideLabel: true,
+      parts: [
+        { kind: 'static', text: 'Informed pt to wear current aligner to act as retainer, new aligners usually arrive in 10 working days.' }
+      ],
+      noteTemplate: (state, ls) => {
+        const t = state.sections.checkin.lines.teethTracking;
+        if (!t || !t.exists || t.value !== 'No') return null;
+        return 'Informed pt to wear current aligner to act as retainer, new aligners usually arrive in 10 working days.';
+      }
+    }
+  ]
+},
+
+/* ============================================================
+   2. ATTACHMENTS
+============================================================ */
+{
+  id: 'attachments',
+  title: 'Attachments',
+  intro: null,
+  lines: [
+    {
+      id: 'attachmentStatus',
+      type: 'buttonGroup',
+      label: '',
+      hideLabel: true,
+      options: [
+        'All attachments still present, no changes needed',
+        'Loss of attachments, new template required',
+        'Attachments changed as below'
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'Attachments changed as below') return 'Attachments changed as below:';
+        return 'Attachments: ' + ls.value.charAt(0).toLowerCase() + ls.value.slice(1) + '.';
+      }
+    },
+    {
+      id: 'attachRemoved',
+      type: 'toothInput',
+      label: 'Removed:',
+      nilOption: true,
+      placeholder: 'Tooth #(s)',
+      noteTemplate: (state, ls) => {
+        const a = state.sections.attachments.lines.attachmentStatus;
+        if (!a || !a.exists || a.value !== 'Attachments changed as below') return null;
+        if (ls.nil) return 'Attachments removed: none.';
+        if (!ls.teeth || !ls.teeth.trim()) return null;
+        return 'Attachments removed: ' + ls.teeth.trim() + '.';
+      }
+    },
+    {
+      id: 'attachPlaced',
+      type: 'toothInput',
+      label: 'Placed:',
+      nilOption: true,
+      placeholder: 'Tooth #(s)',
+      noteTemplate: (state, ls) => {
+        const a = state.sections.attachments.lines.attachmentStatus;
+        if (!a || !a.exists || a.value !== 'Attachments changed as below') return null;
+        if (ls.nil) return 'Attachments placed: none.';
+        if (!ls.teeth || !ls.teeth.trim()) return null;
+        return 'Attachments placed: ' + ls.teeth.trim() + '.';
+      }
+    },
+    {
+      id: 'attachComposite',
+      type: 'compound',
+      label: '',
+      hideLabel: true,
+      parts: [
+        { kind: 'static', text: 'Tooth surface smoothened out. The enamel surfaces were etched, primed, and bonding (Optibond-FL) was applied to the etched surfaces.' },
+        { kind: 'pills', key: 'composite', options: ['Flowable', 'Bulk fill'] },
+        { kind: 'static', text: 'composite was loaded into the attachment template.' }
+      ],
+      noteTemplate: (state, ls) => {
+        const a = state.sections.attachments.lines.attachmentStatus;
+        if (!a || !a.exists || a.value !== 'Attachments changed as below') return null;
+        let s = 'Tooth surface smoothened out. The enamel surfaces were etched, primed, and bonding (Optibond-FL) was applied to the etched surfaces.';
+        if (ls.composite) s += ' ' + ls.composite + ' composite was loaded into the attachment template.';
+        return s;
+      }
+    },
+    {
+      id: 'attachTemplate',
+      type: 'compound',
+      label: '',
+      hideLabel: true,
+      parts: [{ kind: 'static', text: 'The attachment template was inserted onto the arch and positioned into place. The attachments were light cured and the template was then removed. Excess bonding was cleaned and polished off from the surrounding areas of the attachments.' }],
+      noteTemplate: (state, ls) => {
+        const a = state.sections.attachments.lines.attachmentStatus;
+        if (!a || !a.exists || a.value !== 'Attachments changed as below') return null;
+        return 'The attachment template was inserted onto the arch and positioned into place. The attachments were light cured and the template was then removed. Excess bonding was cleaned and polished off from the surrounding areas of the attachments.';
+      }
+    }
+  ]
+},
+
+/* ============================================================
+   3. ALIGNERS
+============================================================ */
+{
+  id: 'aligners',
+  title: 'Aligners',
+  intro: null,
+  lines: [
+    {
+      id: 'newAlignersFitted',
+      type: 'compound',
+      label: '',
+      hideLabel: true,
+      parts: [{ kind: 'static', text: 'New aligners fitted - fitting well no issues pt can take in and out.' }],
+      noteTemplate: (state, ls) => 'New aligners fitted - fitting well no issues pt can take in and out.'
+    },
+    {
+      id: 'alignersIssued',
+      type: 'compound',
+      label: 'Aligners issued:',
+      parts: [
+        { kind: 'text', key: 'from', placeholder: 'From' },
+        { kind: 'static', text: 'to' },
+        { kind: 'text', key: 'to', placeholder: 'To' }
+      ],
+      noteTemplate: (state, ls) => {
+        const f = ls.from && ls.from.trim() ? ls.from.trim() : '';
+        const t = ls.to && ls.to.trim() ? ls.to.trim() : '';
+        if (!f && !t) return null;
+        if (f && t) return 'Aligners issued: ' + f + ' to ' + t + '.';
+        return 'Aligner issued: ' + (f || t) + '.';
+      }
+    }
+  ]
+},
+
+/* ============================================================
+   4. NEXT APPOINTMENT
+============================================================ */
+{
+  id: 'nextAppointment',
+  title: 'Next appointment',
+  intro: null,
+  lines: [
+    {
+      id: 'nextAppt',
+      type: 'compound',
+      label: '',
+      hideLabel: true,
+      parts: [
+        { kind: 'text', key: 'weeks', placeholder: 'Number' },
+        { kind: 'static', text: 'weeks' },
+        { kind: 'pills', key: 'purpose', options: ['Follow up', 'Attachment repair', 'Impression', 'Attachment debonding', 'Retainer delivery'] }
+      ],
+      noteTemplate: (state, ls) => {
+        const w = (ls.weeks && ls.weeks.trim()) ? ls.weeks.trim() : '';
+        if (!w && !ls.purpose) return null;
+        let s = 'Next appointment';
+        if (w) s += ' in ' + w + ' ' + (w === '1' ? 'week' : 'weeks');
+        if (ls.purpose) s += ' for ' + ls.purpose.charAt(0).toLowerCase() + ls.purpose.slice(1);
+        return s + '.';
+      }
+    }
+  ]
+}
+
+];
+
+/* ============================================================
+   LESION NOTE BUILDER HELPER
+============================================================ */
+function buildLesionNote(label, ls, hasLocation) {
+  if (!ls.mode) return null;
+  if (ls.mode !== 'lesion') {
+    return label + ': ' + ls.mode.toLowerCase() + '.';
+  }
+  const parts = [];
+  if (hasLocation && ls.location && ls.location.trim()) {
+    parts.push('lesion located at ' + ls.location.trim());
+  }
+  if (ls.useToothInput && ls.teethInput && ls.teethInput.trim()) {
+    parts.push('at tooth/teeth ' + ls.teethInput.trim());
+  }
+  const desc = [];
+  if (ls.colour && ls.colour !== 'Other') desc.push(ls.colour.toLowerCase());
+  else if (ls.colour === 'Other' && ls.colourOther) desc.push(ls.colourOther.trim());
+  if (ls.sizeW && ls.sizeH) desc.push('size ' + ls.sizeW + ' x ' + ls.sizeH + 'mm');
+  if (desc.length) parts.push('described as ' + desc.join(', '));
+  if (ls.surface && ls.surface.length) parts.push('surface: ' + ls.surface.join('/'));
+  const shapeItems = [];
+  if (ls.shapeBase) shapeItems.push(ls.shapeBase);
+  if (ls.shapeBase2) shapeItems.push(ls.shapeBase2);
+  if (ls.shapeDemarca) shapeItems.push(ls.shapeDemarca);
+  if (ls.shapeHomog) shapeItems.push(ls.shapeHomog);
+  if (shapeItems.length) parts.push('shape: ' + shapeItems.join(', '));
+  if (parts.length === 0) return label + ': a lesion was observed.';
+  return label + ': a lesion was observed as follows — ' + parts.join('; ') + '.';
+}
+
+/* ============================================================
+   DIAGNOSIS → DISCUSSION LINKED BLOCKS
+============================================================ */
+const DIAGNOSIS_DISCUSSION_MAP = {};
+
+/* ============================================================
+   DIAGNOSIS → TREATMENT PLAN LINKED BLOCKS
+============================================================ */
+const DIAGNOSIS_TXPLAN_MAP = {};
+
+const SECTIONS_HELPERS = {
+  findSection: (id) => SECTIONS.find(s => s.id === id),
+  findLine: (sid, lid) => { const s = SECTIONS.find(x => x.id === sid); return s ? s.lines.find(l => l.id === lid) : null; }
+};
+
+/* Lesion block shared constants */
+const SURFACE_OPTIONS  = ['smooth','rough','ulcerated','verrucous','sloughing','pseudomembranous','other'];
+const LESION_COLOURS   = ['Red','White','Red and white','Brown','Same as surrounding tissue','Other'];
+const SHAPE_BASE       = ['circular','oval','irregular'];
+const SHAPE_BASE2      = ['raised','sessile','pedunculated'];
+const SHAPE_DEMARCA    = ['well-demarcated','ill-demarcated'];
+const SHAPE_HOMOG      = ['homogenous','heterogenous'];/* ============================================================
+   DENTAL NOTE BUILDER - RENDERING ENGINE
+   ============================================================ */
+
+(function () {
+
+  /* ------------------------------------------------------------
+     STATE
+     state.sections[sectionId] = {
+       skipped: bool,
+       lines: { [lineId]: { exists: bool, ...lineState } }
+     }
+  ------------------------------------------------------------ */
+  const state = { sections: {} };
+
+  function initState() {
+    state.sections = {};
+    SECTIONS.forEach(sec => {
+      const lineStates = {};
+      sec.lines.forEach(line => {
+        lineStates[line.id] = { exists: true, ...defaultLineState(line) };
+      });
+      state.sections[sec.id] = { skipped: false, lines: lineStates, order: sec.lines.map(l => l.id), customLines: [] };
+    });
+  }
+
+  function defaultLineState(line) {
+    switch (line.type) {
+      case 'vitals':
+        return { bp: '', wrist: '', pulse: '', bt: '' };
+      case 'buttonGroup':
+        return { value: '' };
+      case 'buttonGroupOther':
+        return { value: '', otherText: '' };
+      case 'buttonGroupLesion':
+        return { value: '', lesionText: '' };
+      case 'multiButtonGroup':
+        return { selected: [] };
+      case 'dropdown':
+        return { value: '' };
+      case 'dropdownDescriptive':
+        return { value: '' };
+      case 'modalMultiSelect':
+        return { selected: [], otherText: '' };
+      case 'toothInput':
+        return { teeth: '', nil: false };
+      case 'staticHeading':
+        return {};
+      case 'riskItem':
+        return { value: '' };
+      case 'lesionBlock':
+        return {
+          mode: '', side: '', location: '', teethInput: '',
+          colour: '', colourOther: '', sizeW: '', sizeH: '',
+          surface: [], shapeBase: '', shapeBase2: '',
+          shapeDemarca: '', shapeHomog: ''
+        };
+      case 'compound': {
+        const ls = {};
+        (line.parts || []).forEach(p => {
+          if (p.kind === 'pills' || p.kind === 'pillsLesion' || p.kind === 'select') ls[p.key] = '';
+          if (p.kind === 'multiPills' || p.kind === 'modalMultiPart') ls[p.key] = [];
+          if (p.kind === 'text' || p.kind === 'otherPill') ls[p.key] = '';
+          if (p.kind === 'pillsLesion') ls['lesionText'] = '';
+          if (p.kind === 'pillsConditional') { ls[p.key] = false; ls[p.teethKey] = ''; }
+        });
+        return ls;
+      }
+      default:
+        return {};
+    }
+  }
+
+  /* ------------------------------------------------------------
+     DOM HELPERS
+  ------------------------------------------------------------ */
+  function el(tag, props = {}, children = []) {
+    const node = document.createElement(tag);
+    Object.entries(props).forEach(([k, v]) => {
+      if (k === 'class') node.className = v;
+      else if (k === 'text') node.textContent = v;
+      else if (k.startsWith('on') && typeof v === 'function') node.addEventListener(k.slice(2).toLowerCase(), v);
+      else if (v !== null && v !== undefined) node.setAttribute(k, v);
+    });
+    children.forEach(c => { if (c) node.appendChild(c); });
+    return node;
+  }
+
+  function makeRemoveBtn(onRemove) {
+    return el('button', { class: 'remove-btn', text: '\u00d7', title: 'Remove this line', onClick: onRemove });
+  }
+
+  function makePillGroup(options, selectedValue, onSelect) {
+    const wrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+    options.forEach(opt => {
+      const optValue = typeof opt === 'object' ? opt.value : opt;
+      const optLabel = typeof opt === 'object' ? opt.label : opt;
+      const btn = el('button', {
+        class: 'pill' + (selectedValue === optValue ? ' active' : ''),
+        text: optLabel,
+        onClick: () => onSelect(selectedValue === optValue ? '' : optValue)
+      });
+      wrap.appendChild(btn);
+    });
+    return wrap;
+  }
+
+  function makeSelect(options, selectedValue, placeholder, onChange, wide) {
+    const select = el('select', wide ? { class: 'wide' } : {});
+    select.appendChild(el('option', { value: '', text: placeholder || 'Select your option' }));
+    options.forEach(opt => {
+      const optValue = typeof opt === 'object' ? opt.value : opt;
+      const optLabel = typeof opt === 'object' ? (opt.label || opt.value) : opt;
+      const o = el('option', { value: optValue, text: optLabel });
+      if (selectedValue === optValue) o.setAttribute('selected', 'selected');
+      select.appendChild(o);
+    });
+    select.addEventListener('change', (e) => onChange(e.target.value));
+    return select;
+  }
+
+  function makeTextInput(value, placeholder, onInput, cls) {
+    const input = el('input', { type: 'text', placeholder: placeholder || '' });
+    if (cls) input.classList.add(cls);
+    input.value = value || '';
+    input.addEventListener('input', (e) => onInput(e.target.value));
+    return input;
+  }
+
+
+  /* ------------------------------------------------------------
+     SHARED MULTI-SELECT MODAL
+  ------------------------------------------------------------ */
+  let modalCallback = null;
+  let modalSelection = [];
+
+  function openModal(title, options, currentSelection) {
+    modalSelection = [...currentSelection];
+    document.getElementById('modal-title').textContent = title || 'Select options';
+    const optionsContainer = document.getElementById('modal-options');
+    optionsContainer.innerHTML = '';
+
+    options.forEach(opt => {
+      const isSelected = modalSelection.includes(opt);
+      const pillEl = el('div', { class: 'modal-option' + (isSelected ? ' selected' : '') });
+      const circle = el('span', { text: isSelected ? '\u25cf' : '\u25cb', style: 'font-size:12px;' });
+      pillEl.appendChild(circle);
+      pillEl.appendChild(document.createTextNode(opt));
+      pillEl.addEventListener('click', () => {
+        if (modalSelection.includes(opt)) {
+          modalSelection = modalSelection.filter(o => o !== opt);
+        } else {
+          modalSelection.push(opt);
+        }
+        const nowSelected = modalSelection.includes(opt);
+        pillEl.classList.toggle('selected', nowSelected);
+        circle.textContent = nowSelected ? '\u25cf' : '\u25cb';
+        document.getElementById('modal-add-btn').disabled = modalSelection.length === 0;
+      });
+      optionsContainer.appendChild(pillEl);
+    });
+
+    document.getElementById('modal-add-btn').disabled = modalSelection.length === 0;
+    document.getElementById('select-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('select-modal').classList.remove('open');
+    modalCallback = null;
+  }
+
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('select-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'select-modal') closeModal();
+  });
+  document.getElementById('modal-add-btn').addEventListener('click', () => {
+    if (modalCallback) modalCallback([...modalSelection]);
+    closeModal();
+  });
+
+
+  /* ------------------------------------------------------------
+     LINE RENDERERS - one function per "type"
+     Each returns a DOM node for the line CONTENT (without the
+     remove button / wrapper); wrapper added by renderLine().
+  ------------------------------------------------------------ */
+
+  const LINE_RENDERERS = {
+
+    vitals: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      content.appendChild(el('span', { class: 'static-text', text: 'BP:' }));
+      content.appendChild(makeTextInput(ls.bp, '__ / __', (v) => { ls.bp = v; renderNote(); }, 'small'));
+      content.appendChild(el('span', { class: 'static-text', text: 'mmHg (' }));
+      content.appendChild(makePillGroup(['right', 'left'], ls.wrist, (v) => { ls.wrist = v; rerenderSection(sectionId); }));
+      content.appendChild(el('span', { class: 'static-text', text: 'wrist strap);' }));
+      content.appendChild(el('span', { class: 'static-text', text: 'Pulse:' }));
+      content.appendChild(makeTextInput(ls.pulse, 'Enter notes here...', (v) => { ls.pulse = v; renderNote(); }, 'small'));
+      content.appendChild(el('span', { class: 'static-text', text: 'bpm, regular;' }));
+      content.appendChild(el('span', { class: 'static-text', text: 'BT:' }));
+      content.appendChild(makeTextInput(ls.bt, 'Enter notes here...', (v) => { ls.bt = v; renderNote(); }, 'small'));
+      content.appendChild(el('span', { class: 'static-text', text: '\u00b0C' }));
+      return content;
+    },
+
+    buttonGroup: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      if (!line.hideLabel) content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      const pillWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+      line.options.forEach(opt => {
+        const optValue = typeof opt === 'object' ? opt.value : opt;
+        const optLabel = typeof opt === 'object' ? opt.label : opt;
+        const btn = el('button', {
+          class: 'pill' + (ls.value === optValue ? ' active' : ''),
+          text: optLabel,
+          onClick: () => {
+            const newVal = ls.value === optValue ? '' : optValue;
+            ls.value = newVal;
+            pillWrap.querySelectorAll('.pill').forEach(b => {
+              b.classList.toggle('active', b.textContent.trim() === newVal);
+            });
+            renderNote();
+          }
+        });
+        pillWrap.appendChild(btn);
+      });
+      content.appendChild(pillWrap);
+      if (line.suffixText) content.appendChild(el('span', { class: 'static-text', text: line.suffixText }));
+      return content;
+    },
+
+    buttonGroupOther: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      if (!line.hideLabel) content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      content.appendChild(makePillGroup(line.options, ls.value, (v) => { ls.value = v; rerenderSection(sectionId); }));
+      const otherTrigger = line.otherTriggerValue || 'Other';
+      if (ls.value === otherTrigger) {
+        content.appendChild(makeTextInput(ls.otherText, 'Specify...', (v) => { ls.otherText = v; renderNote(); }, 'grow'));
+      }
+      return content;
+    },
+
+    buttonGroupLesion: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      const allOptions = line.options.map(o => ({ value: o, label: o }));
+      allOptions.push({ value: 'lesion', label: line.lesionOptionLabel || 'A lesion was observed as follows:' });
+      content.appendChild(makePillGroup(allOptions, ls.value, (v) => { ls.value = v; rerenderSection(sectionId); }));
+      if (ls.value === 'lesion') {
+        content.appendChild(makeTextInput(ls.lesionText, 'Describe lesion...', (v) => { ls.lesionText = v; renderNote(); }, 'grow'));
+      }
+      return content;
+    },
+
+    dropdown: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      content.appendChild(makeSelect(line.options, ls.value, 'Select your option', (v) => { ls.value = v; renderNote(); }, line.wide));
+      if (line.suffix) content.appendChild(el('span', { class: 'static-text', text: line.suffix }));
+      return content;
+    },
+
+    dropdownDescriptive: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      const opts = line.options.map(o => ({ value: o.value, label: o.label }));
+      content.appendChild(makeSelect(opts, ls.value, 'Select your option', (v) => { ls.value = v; renderNote(); }, line.wide));
+      return content;
+    },
+
+    modalMultiSelect: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      if (!line.hideLabel) content.appendChild(el('span', { class: 'line-label', text: line.label }));
+
+      const btnLabel = line.buttonLabel || 'Select options';
+
+      const handleSelectionChange = (sel) => {
+        ls.selected = sel;
+        if (!ls.selected.includes('Other')) ls.otherText = '';
+        rerenderSection(sectionId);
+        // If this is the Diagnosis "options" line, refresh Discussion and Treatment Plan too
+        if (sectionId === 'diagnosis' && line.id === 'options') {
+          const discussionExists = SECTIONS.find(s => s.id === 'discussion');
+          if (discussionExists && state.sections['discussion'] && !state.sections['discussion'].skipped) {
+            rerenderSection('discussion');
+          }
+          const txPlanExists = SECTIONS.find(s => s.id === 'treatmentPlan');
+          if (txPlanExists && state.sections['treatmentPlan'] && !state.sections['treatmentPlan'].skipped) {
+            rerenderSection('treatmentPlan');
+          }
+        }
+      };
+
+      if (ls.selected.length === 0) {
+        const btn = el('button', { class: 'pill' });
+        btn.innerHTML = '\ud83d\udd17 ' + btnLabel + ' \u2295';
+        btn.addEventListener('click', () => {
+          openModal(line.modalTitle, line.options, ls.selected);
+          modalCallback = handleSelectionChange;
+        });
+        content.appendChild(btn);
+      } else {
+        ls.selected.forEach(s => {
+          content.appendChild(el('span', { class: 'pill active', text: s }));
+        });
+        if (ls.selected.includes('Other')) {
+          content.appendChild(makeTextInput(ls.otherText, 'Describe other...', (v) => { ls.otherText = v; renderNote(); }, 'grow'));
+        }
+        const editBtn = el('button', { class: 'pill', text: 'Edit' });
+        editBtn.addEventListener('click', () => {
+          openModal(line.modalTitle, line.options, ls.selected);
+          modalCallback = handleSelectionChange;
+        });
+        content.appendChild(editBtn);
+      }
+      return content;
+    },
+
+    toothInput: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      if (line.nilOption) {
+        const nilBtn = el('button', {
+          class: 'pill' + (ls.nil ? ' active' : ''),
+          text: 'None',
+          onClick: () => {
+            ls.nil = !ls.nil;
+            if (ls.nil) ls.teeth = '';
+            nilBtn.classList.toggle('active', ls.nil);
+            rerenderSection(sectionId);
+          }
+        });
+        content.appendChild(nilBtn);
+      }
+      if (!ls.nil) {
+        content.appendChild(makeTextInput(ls.teeth, line.placeholder || 'Tooth #(s)', (v) => { ls.teeth = v; renderNote(); }, 'medium'));
+      }
+      return content;
+    },
+
+    compound: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      if (!line.hideLabel && line.label) content.appendChild(el('span', { class: 'line-label', text: line.label }));
+
+      (line.parts || []).forEach(part => {
+        switch (part.kind) {
+          case 'static':
+            content.appendChild(el('span', { class: 'static-text', text: part.text }));
+            break;
+          case 'text':
+            content.appendChild(makeTextInput(ls[part.key], part.placeholder, (v) => { ls[part.key] = v; renderNote(); }, 'medium'));
+            break;
+          case 'select':
+            content.appendChild(makeSelect(part.options, ls[part.key], part.placeholder, (v) => { ls[part.key] = v; renderNote(); }));
+            break;
+          case 'pills': {
+            const pillWrap2 = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+            part.options.forEach(opt => {
+              const optValue = typeof opt === 'object' ? opt.value : opt;
+              const optLabel = typeof opt === 'object' ? opt.label : opt;
+              const btn = el('button', {
+                class: 'pill' + (ls[part.key] === optValue ? ' active' : ''),
+                text: optLabel,
+                onClick: () => {
+                  const newVal = ls[part.key] === optValue ? '' : optValue;
+                  ls[part.key] = newVal;
+                  pillWrap2.querySelectorAll('.pill').forEach(b => {
+                    b.classList.toggle('active', b.textContent.trim() === newVal);
+                  });
+                  renderNote();
+                }
+              });
+              pillWrap2.appendChild(btn);
+            });
+            content.appendChild(pillWrap2);
+            break;
+          }
+          case 'multiPills': {
+            const mpWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+            if (!Array.isArray(ls[part.key])) ls[part.key] = [];
+            part.options.forEach(opt => {
+              const isActive = ls[part.key].includes(opt);
+              const btn = el('button', {
+                class: 'pill' + (isActive ? ' active' : ''),
+                text: opt,
+                onClick: () => {
+                  if (!Array.isArray(ls[part.key])) ls[part.key] = [];
+                  if (ls[part.key].includes(opt)) {
+                    ls[part.key] = ls[part.key].filter(v => v !== opt);
+                  } else {
+                    ls[part.key] = [...ls[part.key], opt];
+                  }
+                  btn.classList.toggle('active', ls[part.key].includes(opt));
+                  renderNote();
+                }
+              });
+              mpWrap.appendChild(btn);
+            });
+            content.appendChild(mpWrap);
+            break;
+          }
+          case 'pillsLesion': {
+            const allOptions = part.options.map(o => ({ value: o, label: o }));
+            allOptions.push({ value: 'lesion', label: part.lesionLabel || 'A lesion was observed as follows:' });
+            content.appendChild(makePillGroup(allOptions, ls[part.key], (v) => { ls[part.key] = v; rerenderSection(sectionId); }));
+            if (ls[part.key] === 'lesion') {
+              content.appendChild(makeTextInput(ls.lesionText, 'Describe lesion...', (v) => { ls.lesionText = v; renderNote(); }, 'grow'));
+            }
+            break;
+          }
+          case 'otherPill': {
+            content.appendChild(makeTextInput(ls[part.key], part.placeholder || 'Specify...', (v) => { ls[part.key] = v; renderNote(); }, 'medium'));
+            break;
+          }
+          case 'pillsConditional': {
+            // A toggle pill that, when active, also shows a tooth input
+            const cvBtn = el('button', {
+              class: 'pill' + (ls[part.key] ? ' active' : ''),
+              text: part.label,
+              onClick: () => {
+                ls[part.key] = !ls[part.key];
+                cvBtn.classList.toggle('active', ls[part.key]);
+                rerenderSection(sectionId);
+              }
+            });
+            content.appendChild(cvBtn);
+            if (ls[part.key]) {
+              content.appendChild(makeTextInput(ls[part.teethKey], part.placeholder || 'Tooth #(s)', (v) => { ls[part.teethKey] = v; renderNote(); }, 'medium'));
+            }
+            break;
+          }
+          case 'modalMultiPart': {
+            // Inline modal-trigger button inside a compound line
+            if (!Array.isArray(ls[part.key])) ls[part.key] = [];
+            const selected = ls[part.key];
+            const mpBtn = el('button', { class: 'pill' + (selected.length ? ' active' : '') });
+            const updateMpBtn = () => {
+              mpBtn.textContent = selected.length ? selected.join(', ') : 'Select option';
+              mpBtn.classList.toggle('active', selected.length > 0);
+            };
+            updateMpBtn();
+            mpBtn.addEventListener('click', () => {
+              openModal(part.modalTitle || 'Select option', part.options, [...selected]);
+              modalCallback = (sel) => {
+                ls[part.key] = sel;
+                updateMpBtn();
+                renderNote();
+              };
+            });
+            content.appendChild(mpBtn);
+            break;
+          }
+        }
+      });
+
+      return content;
+    },
+
+    lesionBlock: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content', style: 'flex-direction:column; align-items:flex-start; gap:10px;' });
+
+      // Top row: side picker (optional) + label + base option pills + "A lesion was observed as follows:"
+      const topRow = el('div', { style: 'display:flex; flex-wrap:wrap; align-items:center; gap:10px;' });
+
+      // Side picker (lip/FOM etc.)
+      if (line.sideOptions) {
+        const sideWrap = el('div', { style: 'display:flex; gap:8px;' });
+        line.sideOptions.forEach(opt => {
+          const btn = el('button', {
+            class: 'pill' + (ls.side === opt ? ' active' : ''),
+            text: opt,
+            onClick: () => {
+              ls.side = ls.side === opt ? '' : opt;
+              btn.classList.toggle('active', ls.side === opt);
+              rerenderSection(sectionId);
+            }
+          });
+          sideWrap.appendChild(btn);
+        });
+        topRow.appendChild(sideWrap);
+        if (line.sideLabel) topRow.appendChild(el('span', { class: 'line-label', text: line.sideLabel }));
+      } else if (!line.hideLabel) {
+        topRow.appendChild(el('span', { class: 'line-label', text: line.label }));
+      }
+
+      // Base option pills
+      const modeWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+      (line.baseOptions || []).forEach(opt => {
+        const btn = el('button', {
+          class: 'pill' + (ls.mode === opt ? ' active' : ''),
+          text: opt,
+          onClick: () => {
+            ls.mode = ls.mode === opt ? '' : opt;
+            modeWrap.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+            btn.classList.toggle('active', ls.mode === opt);
+            renderNote();
+          }
+        });
+        modeWrap.appendChild(btn);
+      });
+
+      // "A lesion was observed as follows:" pill
+      const lesionBtn = el('button', {
+        class: 'pill' + (ls.mode === 'lesion' ? ' active' : ''),
+        text: 'A lesion was observed as follows:',
+        onClick: () => {
+          ls.mode = ls.mode === 'lesion' ? '' : 'lesion';
+          rerenderSection(sectionId);
+        }
+      });
+      modeWrap.appendChild(lesionBtn);
+      topRow.appendChild(modeWrap);
+      content.appendChild(topRow);
+
+      // Lesion sub-lines (only shown when mode === 'lesion')
+      if (ls.mode === 'lesion') {
+        const subBlock = el('div', { style: 'border-left:3px solid var(--bg-pill-active); padding-left:14px; display:flex; flex-direction:column; gap:10px; width:100%;' });
+
+        // Location (pill-based or tooth input)
+        if (line.locationOptions) {
+          const locRow = el('div', { style: 'display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:14px;' });
+          locRow.appendChild(el('span', { class: 'static-text', text: line.locationLabel || 'The lesion was located at' }));
+          const locWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+          line.locationOptions.forEach(opt => {
+            const btn = el('button', {
+              class: 'pill' + (ls.location === opt ? ' active' : ''),
+              text: opt,
+              onClick: () => {
+                ls.location = ls.location === opt ? '' : opt;
+                locWrap.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+                if (ls.location) btn.classList.add('active');
+                renderNote();
+              }
+            });
+            locWrap.appendChild(btn);
+          });
+          locRow.appendChild(locWrap);
+          if (line.locationSuffix) locRow.appendChild(el('span', { class: 'static-text', text: line.locationSuffix }));
+          subBlock.appendChild(locRow);
+        } else if (line.useToothInput) {
+          const toothRow = el('div', { style: 'display:flex; align-items:center; gap:8px; font-size:14px;' });
+          toothRow.appendChild(el('span', { class: 'static-text', text: line.locationLabel || 'The lesion was located at' }));
+          const inp = el('input', { type: 'text', placeholder: 'Tooth #(s)', class: 'medium' });
+          inp.value = ls.teethInput || '';
+          inp.addEventListener('input', e => { ls.teethInput = e.target.value; renderNote(); });
+          toothRow.appendChild(inp);
+          subBlock.appendChild(toothRow);
+        }
+
+        // Description row: colour pills + Other text + size
+        const descRow = el('div', { style: 'display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:14px;' });
+        descRow.appendChild(el('span', { class: 'line-label', text: 'The lesion was described as:' }));
+        const colWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+        LESION_COLOURS.forEach(c => {
+          const btn = el('button', {
+            class: 'pill' + (ls.colour === c ? ' active' : ''),
+            text: c,
+            onClick: () => {
+              ls.colour = ls.colour === c ? '' : c;
+              colWrap.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+              if (ls.colour) btn.classList.add('active');
+              rerenderSection(sectionId);
+            }
+          });
+          colWrap.appendChild(btn);
+        });
+        descRow.appendChild(colWrap);
+        if (ls.colour === 'Other') {
+          const otherInp = el('input', { type: 'text', placeholder: 'Describe colour...', class: 'medium' });
+          otherInp.value = ls.colourOther || '';
+          otherInp.addEventListener('input', e => { ls.colourOther = e.target.value; renderNote(); });
+          descRow.appendChild(otherInp);
+        }
+        descRow.appendChild(el('span', { class: 'static-text', text: '; size of' }));
+        subBlock.appendChild(descRow);
+
+        // Size row
+        const sizeRow = el('div', { style: 'display:flex; align-items:center; gap:6px; font-size:14px; padding-left:2px;' });
+        const wInp = el('input', { type: 'text', placeholder: 'Enter notes here...', class: 'small' });
+        wInp.value = ls.sizeW || '';
+        wInp.addEventListener('input', e => { ls.sizeW = e.target.value; renderNote(); });
+        sizeRow.appendChild(wInp);
+        sizeRow.appendChild(el('span', { class: 'static-text', text: 'x' }));
+        const hInp = el('input', { type: 'text', placeholder: 'Enter notes here...', class: 'small' });
+        hInp.value = ls.sizeH || '';
+        hInp.addEventListener('input', e => { ls.sizeH = e.target.value; renderNote(); });
+        sizeRow.appendChild(hInp);
+        sizeRow.appendChild(el('span', { class: 'static-text', text: 'mm;' }));
+        subBlock.appendChild(sizeRow);
+
+        // Surface row (modal multi-select)
+        const surfRow = el('div', { style: 'display:flex; align-items:center; gap:8px; font-size:14px;' });
+        surfRow.appendChild(el('span', { class: 'line-label', text: 'Surface:' }));
+        const surfBtn = el('button', {
+          class: 'pill' + (ls.surface && ls.surface.length ? ' active' : '')
+        });
+        const updateSurfBtn = () => {
+          surfBtn.textContent = ls.surface && ls.surface.length ? ls.surface.join(', ') : 'Select option';
+          surfBtn.classList.toggle('active', ls.surface && ls.surface.length > 0);
+        };
+        updateSurfBtn();
+        surfBtn.addEventListener('click', () => {
+          openModal('Select option', SURFACE_OPTIONS, [...(ls.surface || [])]);
+          modalCallback = sel => { ls.surface = sel; updateSurfBtn(); renderNote(); };
+        });
+        surfRow.appendChild(surfBtn);
+        subBlock.appendChild(surfRow);
+
+        // Shape row
+        const makeShapeGroup = (key, options, separator) => {
+          const wrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px; align-items:center;' });
+          options.forEach(opt => {
+            const btn = el('button', {
+              class: 'pill' + (ls[key] === opt ? ' active' : ''),
+              text: opt,
+              onClick: () => {
+                ls[key] = ls[key] === opt ? '' : opt;
+                wrap.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+                if (ls[key]) btn.classList.add('active');
+                renderNote();
+              }
+            });
+            wrap.appendChild(btn);
+          });
+          if (separator) wrap.appendChild(el('span', { class: 'static-text', text: ';' }));
+          return wrap;
+        };
+        const shapeRow = el('div', { style: 'display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:14px;' });
+        shapeRow.appendChild(el('span', { class: 'line-label', text: 'Shape:' }));
+        // "other" pill for base shape
+        const shapeBaseOpts = [...SHAPE_BASE, 'other'];
+        const baseWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+        shapeBaseOpts.forEach(opt => {
+          const btn = el('button', {
+            class: 'pill' + (ls.shapeBase === opt ? ' active' : ''),
+            text: opt,
+            onClick: () => {
+              ls.shapeBase = ls.shapeBase === opt ? '' : opt;
+              baseWrap.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+              if (ls.shapeBase) btn.classList.add('active');
+              renderNote();
+            }
+          });
+          baseWrap.appendChild(btn);
+        });
+        shapeRow.appendChild(baseWrap);
+        shapeRow.appendChild(el('span', { class: 'static-text', text: ';' }));
+        shapeRow.appendChild(makeShapeGroup('shapeBase2', SHAPE_BASE2, true));
+        shapeRow.appendChild(makeShapeGroup('shapeDemarca', SHAPE_DEMARCA, true));
+        shapeRow.appendChild(makeShapeGroup('shapeHomog', SHAPE_HOMOG, false));
+        subBlock.appendChild(shapeRow);
+
+        content.appendChild(subBlock);
+      }
+
+      return content;
+    },
+
+    staticHeading: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      return content;
+    },
+
+    riskItem: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content', style: 'align-items:center;' });
+      content.appendChild(el('span', { class: 'static-text', style: 'flex:1; margin-right:12px;', text: line.label }));
+      const pillWrap = el('div', { style: 'display:flex; gap:8px; flex-shrink:0;' });
+      (line.options || []).forEach(opt => {
+        const btn = el('button', {
+          class: 'pill' + (ls.value === opt ? ' active' : ''),
+          text: opt,
+          onClick: () => {
+            ls.value = ls.value === opt ? '' : opt;
+            pillWrap.querySelectorAll('.pill').forEach(b => b.classList.toggle('active', b.textContent.trim() === ls.value));
+            renderNote();
+          }
+        });
+        pillWrap.appendChild(btn);
+      });
+      content.appendChild(pillWrap);
+      return content;
+    }
+
+  };
+
+
+  /* ------------------------------------------------------------
+     SECTION RENDERING
+  ------------------------------------------------------------ */
+
+  function renderLine(sec, line, sectionId) {
+    const sectionState = state.sections[sectionId];
+    const ls = sectionState.lines[line.id];
+    if (!ls.exists) return null;
+
+    const renderer = LINE_RENDERERS[line.type];
+    if (!renderer) return null;
+
+    const content = renderer(line, ls, sectionId);
+
+    const lineEl = el('div', { class: 'line' }, [
+      content,
+      makeRemoveBtn(() => {
+        ls.exists = false;
+        rerenderSection(sectionId);
+      })
+    ]);
+    return lineEl;
+  }
+
+  function renderSection(sec) {
+    const sectionState = state.sections[sec.id];
+
+    const card = el('div', { class: 'card', id: 'card-' + sec.id });
+    if (sectionState.skipped) card.classList.add('section-skipped');
+
+    const header = el('div', { class: 'card-header' });
+    header.appendChild(el('h2', { text: sec.title }));
+    const controls = el('div', { class: 'section-controls' });
+    const skipBtn = el('button', { class: 'skip-section-btn', text: 'Skip section' });
+    skipBtn.addEventListener('click', () => {
+      sectionState.skipped = true;
+      renderAll();
+    });
+    controls.appendChild(skipBtn);
+    header.appendChild(controls);
+    card.appendChild(header);
+
+    if (sec.intro) {
+      const introText = typeof sec.intro === 'function' ? sec.intro(state) : sec.intro;
+      card.appendChild(el('p', { class: 'intro-text', text: introText }));
+    }
+
+    // Restore pills for removed template lines
+    const removedLineIds = sectionState.order.filter(id => !sectionState.lines[id].exists);
+    if (removedLineIds.length > 0) {
+      const restoreWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;' });
+      removedLineIds.forEach(lineId => {
+        const line = sec.lines.find(l => l.id === lineId);
+        const restoreLabel = (line.label && line.label.trim()) ? line.label.replace(/[:\s]+$/, '') : 'line';
+        const btn = el('button', { class: 'pill', text: '+ Restore: ' + restoreLabel });
+        btn.addEventListener('click', () => {
+          sectionState.lines[lineId].exists = true;
+          rerenderSection(sec.id);
+        });
+        restoreWrap.appendChild(btn);
+      });
+      card.appendChild(restoreWrap);
+    }
+
+    const linesContainer = el('div', { id: 'lines-' + sec.id });
+    sectionState.order.forEach(lineId => {
+      const line = sec.lines.find(l => l.id === lineId);
+      const lineEl = renderLine(sec, line, sec.id);
+      if (lineEl) linesContainer.appendChild(lineEl);
+    });
+
+    // Custom free-text comment lines (added via "+ Add line")
+    sectionState.customLines.forEach((customLine, idx) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(makeTextInput(customLine.text, 'Type additional note...', (v) => {
+        customLine.text = v;
+        renderNote();
+      }, 'grow'));
+
+      const lineEl = el('div', { class: 'line' }, [
+        content,
+        makeRemoveBtn(() => {
+          sectionState.customLines.splice(idx, 1);
+          rerenderSection(sec.id);
+        })
+      ]);
+      linesContainer.appendChild(lineEl);
+    });
+
+    card.appendChild(linesContainer);
+
+    // Special: dynamic discussion blocks linked to diagnosis
+    if (sec.id === 'discussion') {
+      const dynBlocks = renderDiscussionBlocks();
+      dynBlocks.forEach(b => card.appendChild(b));
+    }
+
+    // Special: dynamic treatment plan blocks linked to diagnosis
+    if (sec.id === 'treatmentPlan') {
+      const txBlocks = renderTxPlanBlocks();
+      txBlocks.forEach(b => card.appendChild(b));
+    }
+
+    // "Add line" button - always active; adds a free-text comment line
+    const addBtn = el('button', { class: 'add-line-btn' });
+    addBtn.innerHTML = '<span class="icon-circle">+</span> Add line';
+    addBtn.addEventListener('click', () => {
+      sectionState.customLines.push({ text: '' });
+      rerenderSection(sec.id);
+    });
+    card.appendChild(addBtn);
+
+    return card;
+  }
+
+  function rerenderSection(sectionId) {
+    const sec = SECTIONS.find(s => s.id === sectionId);
+    const oldCard = document.getElementById('card-' + sectionId);
+    const newCard = renderSection(sec);
+    if (oldCard) oldCard.replaceWith(newCard);
+    renderNote();
+    renderSkippedTray();
+  }
+
+
+  /* ------------------------------------------------------------
+     DISCUSSION DYNAMIC BLOCKS (linked to Diagnosis selections)
+  ------------------------------------------------------------ */
+
+  // persistent state for discussion sub-blocks, keyed by diagnosis label
+  const discussionBlockState = {};
+
+  function getDiagnosisSelections() {
+    const diagSection = state.sections['diagnosis'];
+    if (!diagSection || diagSection.skipped) return [];
+    const ls = diagSection.lines['options'];
+    if (!ls || !ls.exists) return [];
+    return ls.selected || [];
+  }
+
+  function renderDiscussionBlocks() {
+    const selections = getDiagnosisSelections();
+    const blocks = [];
+
+    selections.forEach(diagLabel => {
+      const mapping = DIAGNOSIS_DISCUSSION_MAP[diagLabel];
+      if (!mapping) return;
+
+      if (!discussionBlockState[diagLabel]) {
+        const initial = {};
+        (mapping.parts || []).forEach(p => {
+          if (p.kind === 'select' || p.kind === 'pills' || p.kind === 'text') initial[p.key] = '';
+        });
+        discussionBlockState[diagLabel] = initial;
+      }
+      const ls = discussionBlockState[diagLabel];
+
+      const block = el('div', { class: 'discussion-block' });
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'diag-tag', text: mapping.tag }));
+
+      (mapping.parts || []).forEach(part => {
+        switch (part.kind) {
+          case 'static':
+            content.appendChild(el('span', { class: 'static-text', text: part.text }));
+            break;
+          case 'text':
+            content.appendChild(makeTextInput(ls[part.key], part.placeholder, (v) => { ls[part.key] = v; renderNote(); }, 'medium'));
+            break;
+          case 'select':
+            content.appendChild(makeSelect(part.options, ls[part.key], part.placeholder, (v) => { ls[part.key] = v; renderNote(); }));
+            break;
+          case 'pills': {
+            const dpWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+            part.options.forEach(opt => {
+              const shortLabel = opt.length > 60 ? opt.slice(0, 57) + '...' : opt;
+              const btn = el('button', {
+                class: 'pill' + (ls[part.key] === opt ? ' active' : ''),
+                text: shortLabel,
+                onClick: () => {
+                  const newVal = ls[part.key] === opt ? '' : opt;
+                  ls[part.key] = newVal;
+                  dpWrap.querySelectorAll('.pill').forEach(b => {
+                    b.classList.toggle('active', b.textContent.trim() === (newVal.length > 60 ? newVal.slice(0,57)+'...' : newVal));
+                  });
+                  // update body text preview
+                  const preview = block.querySelector('p.static-text');
+                  if (preview) preview.textContent = mapping.body(ls);
+                  renderNote();
+                }
+              });
+              dpWrap.appendChild(btn);
+            });
+            content.appendChild(dpWrap);
+            break;
+          }
+        }
+      });
+
+      block.appendChild(content);
+
+      // preview of generated body text for this block
+      const bodyText = mapping.body(ls);
+      block.appendChild(el('p', { class: 'static-text', style: 'margin: 8px 0 0; color: var(--text-muted);', text: bodyText }));
+
+      blocks.push(block);
+    });
+
+    return blocks;
+  }
+
+  /* ------------------------------------------------------------
+     TREATMENT PLAN DYNAMIC BLOCKS (linked to Diagnosis)
+  ------------------------------------------------------------ */
+
+  const txPlanBlockState = {};
+
+  function renderTxPlanBlocks() {
+    const selections = getDiagnosisSelections();
+    const blocks = [];
+
+    selections.forEach(diagLabel => {
+      const mapping = DIAGNOSIS_TXPLAN_MAP[diagLabel];
+      if (!mapping) return;
+
+      if (!txPlanBlockState[diagLabel]) {
+        const initial = {};
+        (mapping.parts || []).forEach(p => {
+          if (p.kind === 'pills' || p.kind === 'text') initial[p.key] = '';
+          if (p.kind === 'nilToothInputTx') { initial[p.key] = ''; initial[p.key + 'None'] = false; }
+        });
+        txPlanBlockState[diagLabel] = initial;
+      }
+      const ls = txPlanBlockState[diagLabel];
+
+      const block = el('div', { class: 'discussion-block' });
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'diag-tag', text: mapping.tag + ':' }));
+
+      (mapping.parts || []).forEach(part => {
+        switch (part.kind) {
+          case 'static':
+            content.appendChild(el('span', { class: 'static-text', text: part.text }));
+            break;
+          case 'text':
+            content.appendChild(makeTextInput(ls[part.key], part.placeholder, (v) => { ls[part.key] = v; renderNote(); }, 'medium'));
+            break;
+          case 'nilToothInputTx': {
+            const noneBtn = el('button', {
+              class: 'pill' + (ls[part.key + 'None'] ? ' active' : ''),
+              text: 'None',
+              onClick: () => {
+                ls[part.key + 'None'] = !ls[part.key + 'None'];
+                if (ls[part.key + 'None']) ls[part.key] = '';
+                noneBtn.classList.toggle('active', ls[part.key + 'None']);
+                renderNote();
+              }
+            });
+            content.appendChild(noneBtn);
+            if (!ls[part.key + 'None']) {
+              content.appendChild(makeTextInput(ls[part.key], part.placeholder, (v) => { ls[part.key] = v; renderNote(); }, 'medium'));
+            }
+            break;
+          }
+          case 'pills': {
+            const txWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+            part.options.forEach(opt => {
+              const shortLabel = opt.length > 60 ? opt.slice(0, 57) + '...' : opt;
+              const btn = el('button', {
+                class: 'pill' + (ls[part.key] === opt ? ' active' : ''),
+                text: shortLabel,
+                onClick: () => {
+                  const newVal = ls[part.key] === opt ? '' : opt;
+                  ls[part.key] = newVal;
+                  txWrap.querySelectorAll('.pill').forEach(b => {
+                    b.classList.toggle('active', b.textContent.trim() === (newVal.length > 60 ? newVal.slice(0,57)+'...' : newVal));
+                  });
+                  const preview = block.querySelector('p.static-text');
+                  if (preview) preview.textContent = mapping.body(ls) || '';
+                  renderNote();
+                }
+              });
+              txWrap.appendChild(btn);
+            });
+            content.appendChild(txWrap);
+            break;
+          }
+        }
+      });
+
+      block.appendChild(content);
+
+      const bodyText = mapping.body(ls);
+      if (bodyText) {
+        block.appendChild(el('p', { class: 'static-text', style: 'margin: 8px 0 0; color: var(--text-muted);', text: bodyText }));
+      }
+
+      blocks.push(block);
+    });
+
+    return blocks;
+  }
+
+  /* ------------------------------------------------------------
+     SKIPPED SECTIONS TRAY
+  ------------------------------------------------------------ */
+
+  function renderSkippedTray() {
+    const tray = document.getElementById('skipped-tray');
+    const list = document.getElementById('skipped-list');
+    list.innerHTML = '';
+
+    const skipped = SECTIONS.filter(sec => state.sections[sec.id].skipped);
+    if (skipped.length === 0) {
+      tray.classList.add('empty');
+      return;
+    }
+    tray.classList.remove('empty');
+
+    skipped.forEach(sec => {
+      const btn = el('button', { class: 'restore-pill' });
+      btn.innerHTML = '<i>+</i> Restore: ' + sec.title;
+      btn.addEventListener('click', () => {
+        state.sections[sec.id].skipped = false;
+        renderAll();
+      });
+      list.appendChild(btn);
+    });
+  }
+
+
+  /* ------------------------------------------------------------
+     NOTE GENERATION
+  ------------------------------------------------------------ */
+
+  function renderNote() {
+    const noteParts = [];
+
+    SECTIONS.forEach(sec => {
+      const sectionState = state.sections[sec.id];
+      if (sectionState.skipped) return;
+
+      const sectionLines = [];
+
+      // intro text
+      if (sec.intro && sec.id !== 'discussion') {
+        const introText = typeof sec.intro === 'function' ? sec.intro(state) : sec.intro;
+        sectionLines.push(introText);
+      }
+
+      sectionState.order.forEach(lineId => {
+        const line = sec.lines.find(l => l.id === lineId);
+        const ls = sectionState.lines[lineId];
+        if (!ls.exists) return;
+        const text = line.noteTemplate(state, ls);
+        if (text) sectionLines.push(text);
+      });
+
+      // custom free-text comment lines
+      const customTexts = sectionState.customLines
+        .map(cl => cl.text && cl.text.trim())
+        .filter(t => t);
+
+      // discussion section: intro + patient response + dynamic blocks
+      if (sec.id === 'discussion') {
+        // intro already pushed above? no - skip it there, handle here for ordering
+      }
+
+      if (sec.id === 'discussion') {
+        const discussionLines = [];
+        if (sec.intro) discussionLines.push(typeof sec.intro === 'function' ? sec.intro(state) : sec.intro);
+        sectionLines.forEach(t => discussionLines.push(t));
+
+        // dynamic diagnosis blocks
+        const selections = getDiagnosisSelections();
+        selections.forEach(diagLabel => {
+          const mapping = DIAGNOSIS_DISCUSSION_MAP[diagLabel];
+          if (!mapping) return;
+          const ls = discussionBlockState[diagLabel] || {};
+          const bodyText = mapping.body(ls);
+          discussionLines.push(mapping.tag + ': ' + bodyText);
+        });
+
+        // custom comment lines
+        customTexts.forEach(t => discussionLines.push(t));
+
+        if (discussionLines.length > 0) {
+          noteParts.push(sec.title + '\n' + discussionLines.join(' '));
+        }
+        return;
+      }
+
+      // Treatment Plan: add diagnosis-linked blocks
+      if (sec.id === 'treatmentPlan') {
+        customTexts.forEach(t => sectionLines.push(t));
+        const txSelections = getDiagnosisSelections();
+        txSelections.forEach(diagLabel => {
+          const mapping = DIAGNOSIS_TXPLAN_MAP[diagLabel];
+          if (!mapping) return;
+          const ls = txPlanBlockState[diagLabel] || {};
+          const bodyText = mapping.body(ls);
+          if (bodyText) sectionLines.push(bodyText);
+        });
+        if (sectionLines.length > 0) {
+          noteParts.push(sec.title + '\n' + sectionLines.join(' '));
+        }
+        return;
+      }
+
+      // custom comment lines
+      customTexts.forEach(t => sectionLines.push(t));
+
+      if (sectionLines.length > 0) {
+        noteParts.push(sec.title + '\n' + sectionLines.join(' '));
+      }
+    });
+
+    document.getElementById('note-output').textContent = noteParts.join('\n\n');
+  }
+
+
+  /* ------------------------------------------------------------
+     FULL RENDER / RESET / ACTIONS
+  ------------------------------------------------------------ */
+
+  function renderAll() {
+    const container = document.getElementById('container');
+    container.innerHTML = '';
+    SECTIONS.forEach(sec => {
+      container.appendChild(renderSection(sec));
+    });
+    renderNote();
+    renderSkippedTray();
+  }
+
+  document.getElementById('copy-btn').addEventListener('click', () => {
+    const text = document.getElementById('note-output').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-btn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1200);
+    });
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    initState();
+    Object.keys(discussionBlockState).forEach(k => delete discussionBlockState[k]);
+    Object.keys(txPlanBlockState).forEach(k => delete txPlanBlockState[k]);
+    renderAll();
+  });
+
+
+  /* ------------------------------------------------------------
+     INIT
+  ------------------------------------------------------------ */
+  initState();
+  renderAll();
+
+})();
+
+</script>
+<nav class="section-footer" id="section-footer" aria-label="Jump to section"></nav>
+
+<script>
+/* ---- Section footer: build links and keep active state on scroll ---- */
+(function() {
+  const SECTION_TITLES = [
+    { id: 'checkin',         label: 'Invisalign Follow-up / Review' },
+    { id: 'attachments',     label: 'Attachments' },
+    { id: 'aligners',        label: 'Aligners' },
+    { id: 'nextAppointment', label: 'Next appointment' },
+  ];
+
+  const footer = document.getElementById('section-footer');
+
+  function buildFooter() {
+    footer.innerHTML = '';
+    SECTION_TITLES.forEach(({ id, label }) => {
+      const btn = document.createElement('button');
+      btn.className = 'footer-link';
+      btn.textContent = label;
+      btn.dataset.sectionId = id;
+
+      const card = document.getElementById('card-' + id);
+      if (card && card.classList.contains('section-skipped')) {
+        btn.classList.add('skipped');
+      }
+
+      btn.addEventListener('click', () => {
+        const target = document.getElementById('card-' + id);
+        if (!target) return;
+        // If skipped, just ignore
+        if (target.classList.contains('section-skipped')) return;
+        const offset = 72; // footer height + a little breathing room
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      });
+
+      footer.appendChild(btn);
+    });
+  }
+
+  function updateActiveLink() {
+    const links = footer.querySelectorAll('.footer-link');
+    const footerHeight = footer.offsetHeight + 80;
+    let activeId = null;
+
+    // Find which section is closest to the top of the viewport
+    let minDist = Infinity;
+    SECTION_TITLES.forEach(({ id }) => {
+      const card = document.getElementById('card-' + id);
+      if (!card || card.classList.contains('section-skipped')) return;
+      const rect = card.getBoundingClientRect();
+      const dist = Math.abs(rect.top - footerHeight);
+      if (rect.top <= footerHeight + 40 && dist < minDist) {
+        minDist = dist;
+        activeId = id;
+      }
+    });
+
+    // Fall back to first visible section
+    if (!activeId) {
+      for (const { id } of SECTION_TITLES) {
+        const card = document.getElementById('card-' + id);
+        if (!card || card.classList.contains('section-skipped')) continue;
+        if (card.getBoundingClientRect().top < window.innerHeight) {
+          activeId = id;
+          break;
+        }
+      }
+    }
+
+    links.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.sectionId === activeId);
+    });
+
+    // Scroll the active link into view within the footer
+    const activeBtn = footer.querySelector('.footer-link.active');
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+    }
+  }
+
+  // Rebuild footer whenever the DOM changes (section skipped/restored)
+  const observer = new MutationObserver(() => {
+    buildFooter();
+    updateActiveLink();
+  });
+  observer.observe(document.getElementById('container'), { childList: true, subtree: false });
+
+  window.addEventListener('scroll', updateActiveLink, { passive: true });
+  window.addEventListener('resize', updateActiveLink, { passive: true });
+
+  // Initial build (sections may not exist yet — wait a tick for engine to render)
+  setTimeout(() => {
+    buildFooter();
+    updateActiveLink();
+  }, 100);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>#5 Limited Exam — Dental Note Builder</title>
+<style>
+  :root {
+    --bg-page: #e9e9e7;
+    --bg-card: #ffffff;
+    --bg-pill: #eef1fb;
+    --bg-pill-hover: #e2e7fa;
+    --bg-pill-active: #cfe8de;
+    --text-main: #1d2b36;
+    --text-muted: #5f6b76;
+    --accent: #0f6e56;
+    --border: #dcdfe3;
+    --danger: #c0392b;
+  }
+  * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  body {
+    margin: 0;
+    background: var(--bg-page);
+    padding: 24px 24px 80px;
+    color: var(--text-main);
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 28px 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .card.section-skipped {
+    display: none;
+  }
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+  .card h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  .section-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .skip-section-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .skip-section-btn:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .intro-text {
+    font-size: 15px;
+    color: var(--text-main);
+    margin: 0 0 18px 0;
+    line-height: 1.5;
+  }
+  .line {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .line:last-of-type {
+    border-bottom: none;
+  }
+  .line-content {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+  }
+  .line-label {
+    font-weight: 700;
+    white-space: nowrap;
+    margin-right: 2px;
+  }
+  .remove-btn {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    margin-top: 2px;
+  }
+  .remove-btn:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  .pill {
+    background: var(--bg-pill);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.15s ease;
+    white-space: nowrap;
+  }
+  .pill:hover {
+    background: var(--bg-pill-hover);
+  }
+  .pill.active {
+    background: var(--bg-pill-active);
+    font-weight: 600;
+  }
+  select {
+    background: var(--bg-pill);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: var(--text-main);
+    cursor: pointer;
+    min-width: 180px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230f6e56' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  select.wide {
+    min-width: 320px;
+    max-width: 100%;
+  }
+  input[type="text"] {
+    border: none;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    font-size: 14px;
+    padding: 6px 4px;
+    color: var(--text-main);
+    outline: none;
+    min-width: 60px;
+  }
+  input[type="text"]::placeholder {
+    color: #aab2ba;
+  }
+  input[type="text"].small {
+    width: 70px;
+  }
+  input[type="text"].medium {
+    width: 100px;
+  }
+  input[type="text"].grow {
+    flex: 1;
+    min-width: 150px;
+  }
+  .static-text {
+    font-size: 14px;
+    color: var(--text-main);
+  }
+  .add-line-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px 0 0 0;
+  }
+  .add-line-btn:hover {
+    text-decoration: underline;
+  }
+  .add-line-btn:disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+    text-decoration: none;
+  }
+  .icon-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .add-line-btn:disabled .icon-circle {
+    border-color: var(--text-muted);
+  }
+
+  /* discussion sub-blocks */
+  .discussion-block {
+    border-left: 3px solid var(--bg-pill-active);
+    padding: 10px 0 10px 14px;
+    margin: 10px 0;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .discussion-block .diag-tag {
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  /* Note output */
+  .note-output {
+    background: #f4f6f5;
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-main);
+    min-height: 24px;
+    white-space: pre-wrap;
+  }
+  .note-output-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .action-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .action-btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .action-btn:hover {
+    opacity: 0.85;
+  }
+
+  /* Modal for multi-select */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  .modal-overlay.open {
+    display: flex;
+  }
+  .modal-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  .modal-box h3 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .modal-subtitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin: 16px 0 12px 0;
+  }
+  .modal-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .modal-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-pill);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text-main);
+  }
+  .modal-option.selected {
+    background: var(--bg-pill-active);
+    font-weight: 600;
+  }
+  .modal-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-add-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .modal-add-btn:disabled {
+    background: #c7ccd1;
+    cursor: not-allowed;
+  }
+
+  /* skipped sections tray */
+  .skipped-tray {
+    background: var(--bg-card);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    padding: 16px 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .skipped-tray.empty {
+    display: none;
+  }
+  .skipped-tray-title {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-main);
+  }
+  .restore-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-pill);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: var(--text-main);
+    cursor: pointer;
+    margin: 0 8px 8px 0;
+  }
+  .restore-pill:hover {
+    background: var(--bg-pill-hover);
+  }
+  /* ---- Sticky section nav footer ---- */
+  .section-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0f6e56;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    z-index: 500;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
+  }
+  .section-footer::-webkit-scrollbar { display: none; }
+  .footer-link {
+    flex-shrink: 0;
+    padding: 13px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    cursor: pointer;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    border-bottom: 3px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .footer-link:hover {
+    color: #ffffff;
+    background: rgba(255,255,255,0.08);
+  }
+  .footer-link.active {
+    color: #ffffff;
+    border-bottom-color: #ffffff;
+  }
+  .footer-link.skipped {
+    opacity: 0.35;
+    text-decoration: line-through;
+  }
+  .top-bar {
+    background: var(--accent);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 600;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .top-bar-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 5px 12px;
+    transition: background 0.15s;
+  }
+  .top-bar-back:hover { background: rgba(255,255,255,0.12); color: #fff; }
+  .top-bar-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0; }
+  .top-bar-num {
+    font-size: 12px; font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.12);
+    border-radius: 20px; padding: 2px 10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="top-bar-back" href="index.html">← Dashboard</a>
+  <span class="top-bar-num">#5</span>
+  <h1 class="top-bar-title">Limited Exam</h1>
+</div>
+
+<div class="container" id="container">
+  <!-- Sections render here -->
+</div>
+
+<!-- Skipped sections tray -->
+<div class="skipped-tray empty" id="skipped-tray" style="max-width:960px; margin: 16px auto 0;">
+  <div class="skipped-tray-title">Skipped sections</div>
+  <div id="skipped-list"></div>
+</div>
+
+<!-- Generated note -->
+<div class="container" style="margin-top:24px;">
+  <div class="card">
+    <div class="note-output-label">Generated note</div>
+    <div class="note-output" id="note-output"></div>
+    <div class="actions-row">
+      <button class="action-btn" id="copy-btn">Copy notes</button>
+      <button class="action-btn secondary" id="reset-btn">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Multi-select modal (shared) -->
+<div class="modal-overlay" id="select-modal">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <h3 id="modal-title">Select options</h3>
+    <div class="modal-subtitle">Multi-select</div>
+    <div class="modal-options" id="modal-options"></div>
+    <button class="modal-add-btn" id="modal-add-btn">Add to line</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DENTAL NOTE BUILDER - DATA CONFIGURATION
+   ============================================================
+   Each SECTION has:
+     - id: unique key
+     - title: display heading
+     - intro: optional static intro text (string or function(state)->string)
+     - lines: array of LINE definitions (in default order)
+
+   Each LINE has:
+     - id: unique key within section
+     - type: one of
+         "buttonGroup"      - single-select pills
+         "buttonGroupOther" - single-select pills incl. "Other" -> free text
+         "multiButtonGroup" - multi-select pills (toggle, no modal)
+         "dropdown"         - <select> simple options
+         "dropdownDescriptive" - <select> where chosen option's full text
+                                  is inserted into the note
+         "modalMultiSelect" - "Select options" button opens modal w/ checkboxes
+         "toothInput"       - free text input for tooth numbers
+         "vitals"           - special composite (check-in only)
+         "compound"         - custom multi-part line built from "parts"
+     - label: bold label shown before the controls
+     - options: array of option strings (for simple types)
+     - noteTemplate(state, lineState) -> string | null
+         returns the sentence(s) to insert into the note, or null/'' to skip
+   ============================================================ */
+
+const SECTIONS = [
+
+/* ============================================================
+   1. CHECK-IN NOTE
+============================================================ */
+{
+  id: 'checkin',
+  title: 'Check-in note',
+  intro: null,
+  lines: [
+    {
+      id: 'vitals',
+      type: 'vitals',
+      label: 'Vital signs:',
+      noteTemplate: (state, ls) => {
+        let str = 'Vital signs: BP: ' + (ls.bp || '___') + ' mmHg';
+        if (ls.wrist) str += ' (' + ls.wrist + ' wrist strap)';
+        str += '; Pulse: ' + (ls.pulse || '___') + ' bpm, regular; BT: ' + (ls.bt || '___') + '\u00b0C.';
+        return str;
+      }
+    },
+    {
+      id: 'rmh',
+      type: 'buttonGroup',
+      label: 'RMH:',
+      options: [
+        'No health issue',
+        'No change in health history & medications',
+        'New health issue',
+        'Medication changed',
+        'New health issue and Medication changed'
+      ],
+      noteTemplate: (state, ls) => ls.value ? ('RMH: ' + ls.value + '.') : null
+    },
+    {
+      id: 'room',
+      type: 'dropdown',
+      label: 'Patient seated in the Room',
+      options: ['1', '2', '3', '5'],
+      noteTemplate: (state, ls) => ls.value ? ('Patient seated in room ' + ls.value + '.') : null
+    }
+  ]
+},
+
+/* ============================================================
+   2. LIMITED EXAM
+============================================================ */
+{
+  id: 'limitedExam',
+  title: 'Limited exam',
+  intro: 'The patient came in for the problem-focused exam due to the following issue.',
+  lines: [
+    {
+      id: 'reasons',
+      type: 'modalMultiSelect',
+      label: 'Reasons for visit:',
+      modalTitle: 'Select options',
+      options: [
+        'Sensitivity', 'Cavities', 'Tooth pain', 'Broken tooth', 'Loss of tooth',
+        'Gum pain', 'Bleeding gums', 'Swollen gums', 'Crown / Inlay came off',
+        'Broken restoration', 'Jaw pain', 'Wisdom tooth is hurting', 'Other'
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.selected || ls.selected.length === 0) return null;
+        const list = ls.selected.map(r => {
+          if (r === 'Other' && ls.otherText && ls.otherText.trim()) return ls.otherText.trim();
+          return r.toLowerCase();
+        });
+        return 'Reason(s) for visit: ' + list.join(', ') + '.';
+      }
+    },
+    {
+      id: 'frankl',
+      type: 'dropdownDescriptive',
+      label: 'Frankl Behavioral Rating Scale:',
+      wide: true,
+      options: [
+        { value: '1', label: '1. Definitely Negative. Refusal of treatment, forceful crying, fearfulness.', text: 'Definitely negative (refusal of treatment, forceful crying, fearfulness)' },
+        { value: '2', label: '2. Negative. Reluctance to accept treatment, uncooperative, sullen, withdrawn.', text: 'Negative (reluctance to accept treatment, uncooperative, sullen, withdrawn)' },
+        { value: '3', label: '3. Positive. Acceptance of treatment, cautious behavior at times, following directions cooperatively.', text: 'Positive (acceptance of treatment, cautious behavior at times, following directions cooperatively)' },
+        { value: '4', label: '4. Definitely positive. Good rapport, interest, laughter and enjoyment.', text: 'Definitely positive (good rapport, interest, laughter and enjoyment)' }
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        const opt = SECTIONS_HELPERS.findOption('limitedExam', 'frankl', ls.value);
+        return opt ? ('Frankl Behavioral Rating Scale: ' + opt.text + '.') : null;
+      }
+    },
+    {
+      id: 'attending',
+      type: 'buttonGroupOther',
+      label: 'Attending with:',
+      options: ['Mom', 'Dad', 'Mom and Dad', 'Sibling', 'Alone', 'Carer', 'Guardian', 'Other'],
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'Alone') return 'Patient attended alone.';
+        let str = ls.value === 'Other' ? (ls.otherText && ls.otherText.trim() ? ls.otherText.trim() : 'other') : ls.value.toLowerCase();
+        return 'Patient attended with ' + str + '.';
+      }
+    },
+    {
+      id: 'reasonAttendance',
+      type: 'buttonGroupOther',
+      label: 'Reason for attendance:',
+      options: ['New patient exam', 'Routine paediatric recall exam', 'Parent has a specific concern', 'Other'],
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        let str;
+        if (ls.value === 'Other') {
+          str = ls.otherText && ls.otherText.trim() ? ls.otherText.trim() : 'other';
+        } else {
+          str = ls.value.charAt(0).toLowerCase() + ls.value.slice(1);
+        }
+        return 'Reason for attendance: ' + str + '.';
+      }
+    }
+  ]
+},
+
+/* ============================================================
+   3. SOCIAL / MEDICAL / DENTAL HISTORY
+============================================================ */
+{
+  id: 'socialMedicalDental',
+  title: 'Social / Medical / Dental History',
+  intro: 'Medical questionnaire form filled and signed - See section.',
+  lines: [
+    {
+      id: 'dailyStress',
+      type: 'dropdown',
+      label: 'Daily stress:',
+      options: ['0','1','2','3','4','5','6','7','8','9','10'],
+      suffix: 'out of 10.',
+      noteTemplate: (state, ls) => ls.value ? ('Daily stress: ' + ls.value + ' out of 10.') : null
+    },
+    {
+      id: 'smoking',
+      type: 'buttonGroup',
+      label: 'Smoking:',
+      options: ['Never', 'Ex smoker (stopped smoking)', 'Daily smoker', 'Occasional smoker', 'Using Vape'],
+      noteTemplate: (state, ls) => ls.value ? ('Smoking: ' + ls.value.toLowerCase() + '.') : null
+    },
+    {
+      id: 'healthConditions',
+      type: 'buttonGroupOther',
+      label: 'Health conditions:',
+      hideLabel: true,
+      options: ['No relevant health conditions', 'Relevant health conditions:'],
+      otherTriggerValue: 'Relevant health conditions:',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'Relevant health conditions:') {
+          const detail = ls.otherText && ls.otherText.trim() ? ls.otherText.trim() : '___';
+          return 'Relevant health conditions: ' + detail + '.';
+        }
+        return 'No relevant health conditions.';
+      }
+    },
+    {
+      id: 'allergies',
+      type: 'buttonGroupOther',
+      label: 'Allergies:',
+      hideLabel: true,
+      options: ['No relevant allergies', 'Allergic to penicillin', 'Allergic to:'],
+      otherTriggerValue: 'Allergic to:',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'Allergic to:') {
+          const detail = ls.otherText && ls.otherText.trim() ? ls.otherText.trim() : '___';
+          return 'Allergic to: ' + detail + '.';
+        }
+        if (ls.value === 'No relevant allergies') return 'No relevant allergies.';
+        return 'Allergic to penicillin.';
+      }
+    },
+    {
+      id: 'medication',
+      type: 'buttonGroupOther',
+      label: 'Medication:',
+      hideLabel: true,
+      options: ['No relevant medication', 'Medication:'],
+      otherTriggerValue: 'Medication:',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'Medication:') {
+          const detail = ls.otherText && ls.otherText.trim() ? ls.otherText.trim() : '___';
+          return 'Medication: ' + detail + '.';
+        }
+        return 'No relevant medication.';
+      }
+    },
+    {
+      id: 'lastCheckup',
+      type: 'buttonGroupOther',
+      label: 'Last dental check up:',
+      options: ['6 months ago', '1 year ago', '1.5 years ago', '2 years ago', '>2yrs', 'other'],
+      otherTriggerValue: 'other',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        let str = ls.value === 'other' ? (ls.otherText && ls.otherText.trim() ? ls.otherText.trim() : '___') : ls.value;
+        return 'Last dental check up: ' + str + '.';
+      }
+    },
+    {
+      id: 'anxious',
+      type: 'buttonGroup',
+      label: 'Anxious of dental visits:',
+      options: ['No', 'Yes'],
+      noteTemplate: (state, ls) => ls.value ? ('Anxious of dental visits: ' + ls.value + '.') : null
+    }
+  ]
+},
+
+/* ============================================================
+   4. EXTRA ORAL EXAM
+============================================================ */
+{
+  id: 'extraOralExam',
+  title: 'Extra Oral Exam',
+  intro: null,
+  lines: [
+    {
+      id: 'lymphMusclesTmj',
+      type: 'buttonGroupOther',
+      label: 'Lymph Nodes, Muscles, TMJ:',
+      options: ['WNL', 'Other'],
+      otherTriggerValue: 'Other',
+      otherType: 'text',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'WNL') return 'Lymph Nodes, Muscles, TMJ: within normal limits.';
+        const detail = ls.otherText && ls.otherText.trim() ? ls.otherText.trim() : '___';
+        return 'Lymph Nodes, Muscles, TMJ: ' + detail + '.';
+      }
+    },
+    {
+      id: 'smln',
+      type: 'compound',
+      label: 'SMLN:',
+      parts: [
+        { kind: 'multiPills', key: 'finding', options: ['enlarged', 'tender', 'firm', 'mobile'] },
+        { kind: 'static', text: ', and showing' },
+        { kind: 'select', key: 'location', placeholder: 'Select option', options: ['right submandibular', 'left submandibular', 'right cervical', 'left cervical', 'bilateral'] }
+      ],
+      noteTemplate: (state, ls) => {
+        const findings = (ls.finding || []);
+        if (findings.length === 0 && !ls.location) return null;
+        let str = 'SMLN:';
+        if (findings.length > 0) str += ' ' + findings.join('/');
+        if (ls.location) str += ', showing ' + ls.location;
+        return str + '.';
+      }
+    },
+    {
+      id: 'muscles',
+      type: 'compound',
+      label: 'Muscles:',
+      parts: [
+        { kind: 'pills', key: 'side', options: ['Right', 'Left', 'Bilateral'] },
+        { kind: 'select', key: 'finding', placeholder: 'Select option', options: ['tenderness', 'hypertrophy', 'trigger points', 'spasm'] },
+        { kind: 'static', text: 'showing' },
+        { kind: 'select', key: 'location', placeholder: 'Select option', options: ['masseter', 'temporalis', 'medial pterygoid', 'lateral pterygoid'] }
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.side && !ls.finding && !ls.location) return null;
+        let str = 'Muscles:';
+        const bits = [];
+        if (ls.side) bits.push(ls.side.toLowerCase());
+        if (ls.finding) bits.push(ls.finding);
+        if (bits.length) str += ' ' + bits.join(', ');
+        if (ls.location) str += ' showing ' + ls.location;
+        return str + '.';
+      }
+    },
+    {
+      id: 'tmj',
+      type: 'compound',
+      label: 'TMJ:',
+      parts: [
+        { kind: 'static', text: 'Right' },
+        { kind: 'select', key: 'rightSound', placeholder: 'Select option', options: ['no sounds', 'click', 'crepitus', 'pain'] },
+        { kind: 'static', text: 'and' },
+        { kind: 'select', key: 'rightMovement', placeholder: 'Select option', options: ['normal movement', 'reduced movement', 'deviation on opening'] },
+        { kind: 'static', text: '; Left' },
+        { kind: 'select', key: 'leftSound', placeholder: 'Select option', options: ['no sounds', 'click', 'crepitus', 'pain'] },
+        { kind: 'static', text: 'and' },
+        { kind: 'select', key: 'leftMovement', placeholder: 'Select option', options: ['normal movement', 'reduced movement', 'deviation on opening'] },
+        { kind: 'static', text: '; Maximum mouth opening' },
+        { kind: 'select', key: 'mmoValue', placeholder: 'Select your option', options: ['<20', '20-30', '30-40', '40-50', '>50'] },
+        { kind: 'static', text: 'mm, Range of motion' },
+        { kind: 'pills', key: 'rom', options: ['WNL', 'Limited mouth opening', 'Left deviation', 'Right deviation'] }
+      ],
+      noteTemplate: (state, ls) => {
+        const parts = [];
+        if (ls.rightSound || ls.rightMovement) {
+          let r = 'Right';
+          if (ls.rightSound) r += ' ' + ls.rightSound;
+          if (ls.rightMovement) r += (ls.rightSound ? ' and ' : ' ') + ls.rightMovement;
+          parts.push(r);
+        }
+        if (ls.leftSound || ls.leftMovement) {
+          let l = 'Left';
+          if (ls.leftSound) l += ' ' + ls.leftSound;
+          if (ls.leftMovement) l += (ls.leftSound ? ' and ' : ' ') + ls.leftMovement;
+          parts.push(l);
+        }
+        let str = '';
+        if (parts.length) str += 'TMJ: ' + parts.join('; ') + '.';
+        if (ls.mmoValue) {
+          str += (str ? ' ' : 'TMJ: ') + 'Maximum mouth opening ' + ls.mmoValue + 'mm.';
+        }
+        if (ls.rom) {
+          const romText = ls.rom === 'WNL' ? 'WNL' : ls.rom.toLowerCase();
+          str += (str ? ' ' : 'TMJ: ') + 'Range of motion: ' + romText + '.';
+        }
+        return str || null;
+      }
+    },
+    {
+      id: 'cheek',
+      type: 'compound',
+      label: 'Cheek:',
+      parts: [
+        { kind: 'pills', key: 'side', options: ['No', 'Right', 'Left', 'Bilateral'] },
+        { kind: 'static', text: 'cheek swelling with' },
+        { kind: 'select', key: 'detail', placeholder: 'Select option', options: ['no tenderness', 'tenderness on palpation', 'fluctuance', 'erythema'] }
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.side) return null;
+        if (ls.side === 'No') return 'Cheek: no swelling observed.';
+        let str = 'Cheek: ' + ls.side.toLowerCase() + ' swelling';
+        if (ls.detail) str += ' with ' + ls.detail;
+        return str + '.';
+      }
+    }
+  ]
+},
+
+/* ============================================================
+   5. INTRA ORAL EXAM
+============================================================ */
+{
+  id: 'intraOralExam',
+  title: 'Intra Oral Exam',
+  intro: null,
+  lines: [
+    {
+      id: 'softTissues',
+      type: 'buttonGroupOther',
+      label: 'Soft tissues (Including tongue, palate, mucosa, gingiva, lip, floor of mouth, fauces):',
+      options: ['WNL', 'Other'],
+      otherTriggerValue: 'Other',
+      otherType: 'text',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'WNL') return 'Soft tissues: within normal limits.';
+        const detail = ls.otherText && ls.otherText.trim() ? ls.otherText.trim() : '___';
+        return 'Soft tissues: ' + detail + '.';
+      }
+    },
+    {
+      id: 'softTissueInjury',
+      type: 'compound',
+      label: '',
+      parts: [
+        { kind: 'pills', key: 'type', options: ['Laceration', 'Abrasion', 'Bite wound'] },
+        { kind: 'static', text: 'was observed on' },
+        { kind: 'select', key: 'location', placeholder: 'Select option', options: ['tongue', 'palate', 'buccal mucosa', 'gingiva', 'lip', 'floor of mouth'] }
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.type) return null;
+        let str = ls.type + ' was observed';
+        if (ls.location) str += ' on the ' + ls.location;
+        return str + '.';
+      }
+    },
+    {
+      id: 'tongue',
+      type: 'buttonGroupLesion',
+      label: 'Tongue:',
+      options: ['Normal', 'Scalloped', 'Geographic', 'Lichenoid lesions'],
+      lesionOptionLabel: 'A lesion was observed as follows:',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'lesion') {
+          const detail = ls.lesionText && ls.lesionText.trim() ? ls.lesionText.trim() : '___';
+          return 'Tongue: a lesion was observed as follows: ' + detail + '.';
+        }
+        return 'Tongue: ' + ls.value.toLowerCase() + '.';
+      }
+    },
+    {
+      id: 'palate',
+      type: 'buttonGroupLesion',
+      label: 'Palate:',
+      options: ['Normal', 'Localized trauma'],
+      lesionOptionLabel: 'A lesion was observed as follows:',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'lesion') {
+          const detail = ls.lesionText && ls.lesionText.trim() ? ls.lesionText.trim() : '___';
+          return 'Palate: a lesion was observed as follows: ' + detail + '.';
+        }
+        return 'Palate: ' + ls.value.toLowerCase() + '.';
+      }
+    },
+    {
+      id: 'mucosa',
+      type: 'buttonGroupLesion',
+      label: 'Mucosa:',
+      options: ['Normal', 'Linea alba', 'Pigmentation'],
+      lesionOptionLabel: 'A lesion was observed as follows:',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'lesion') {
+          const detail = ls.lesionText && ls.lesionText.trim() ? ls.lesionText.trim() : '___';
+          return 'Mucosa: a lesion was observed as follows: ' + detail + '.';
+        }
+        return 'Mucosa: ' + ls.value.toLowerCase() + '.';
+      }
+    },
+    {
+      id: 'gingiva',
+      type: 'buttonGroupLesion',
+      label: 'Gingiva:',
+      options: ['Normal', 'Inflamed', 'Pigmentation'],
+      lesionOptionLabel: 'A lesion was observed as follows:',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'lesion') {
+          const detail = ls.lesionText && ls.lesionText.trim() ? ls.lesionText.trim() : '___';
+          return 'Gingiva: a lesion was observed as follows: ' + detail + '.';
+        }
+        return 'Gingiva: ' + ls.value.toLowerCase() + '.';
+      }
+    },
+    {
+      id: 'lip',
+      type: 'compound',
+      label: '',
+      parts: [
+        { kind: 'pills', key: 'side', options: ['Upper', 'Lower'] },
+        { kind: 'static', text: 'Lip:' },
+        { kind: 'pillsLesion', key: 'value', options: ['Normal'], lesionLabel: 'A lesion was observed as follows:' }
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.side || !ls.value) return null;
+        if (ls.value === 'lesion') {
+          const detail = ls.lesionText && ls.lesionText.trim() ? ls.lesionText.trim() : '___';
+          return ls.side + ' lip: a lesion was observed as follows: ' + detail + '.';
+        }
+        return ls.side + ' lip: ' + ls.value.toLowerCase() + '.';
+      }
+    },
+    {
+      id: 'fomFaucesTonsil',
+      type: 'compound',
+      label: '',
+      parts: [
+        { kind: 'pills', key: 'area', options: ['FOM', 'Fauces', 'Tonsil'] },
+        { kind: 'static', text: ':' },
+        { kind: 'pillsLesion', key: 'value', options: ['Normal'], lesionLabel: 'A lesion was observed as follows:' }
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.area || !ls.value) return null;
+        const areaLabel = ls.area === 'FOM' ? 'Floor of mouth' : ls.area;
+        if (ls.value === 'lesion') {
+          const detail = ls.lesionText && ls.lesionText.trim() ? ls.lesionText.trim() : '___';
+          return areaLabel + ': a lesion was observed as follows: ' + detail + '.';
+        }
+        return areaLabel + ': ' + ls.value.toLowerCase() + '.';
+      }
+    },
+    {
+      id: 'provisionalDiagnosisIO',
+      type: 'modalMultiSelect',
+      label: 'Provisional diagnosis:',
+      modalTitle: 'Select options',
+      options: [
+        'Excessive gagging reflex', 'Parulis fistula', 'Geographic tongue', 'Xerostomia',
+        'Aphthous ulcer', 'Herpetic gingivostomatitis', 'Traumatic ulcer', 'Fordyce granules',
+        'Gingival fibrous nodules', 'Mucocele', 'Pyogenic granuloma', 'Nicotine stomatitis',
+        'Lichen planus', 'Other'
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.selected || ls.selected.length === 0) return null;
+        const list = ls.selected.map(r => {
+          if (r === 'Other' && ls.otherText && ls.otherText.trim()) return ls.otherText.trim();
+          return r.toLowerCase();
+        });
+        return 'Provisional diagnosis: ' + list.join(', ') + '.';
+      }
+    }
+  ]
+},
+
+/* ============================================================
+   6. DENTAL EXAM
+============================================================ */
+{
+  id: 'dentalExam',
+  title: 'Dental Exam',
+  intro: null,
+  lines: [
+    {
+      id: 'examType',
+      type: 'buttonGroup',
+      label: '',
+      hideLabel: true,
+      options: ['Teeth examined and charted', 'Teeth examined/charted and perio chart completed'],
+      noteTemplate: (state, ls) => ls.value ? (ls.value + '.') : null
+    },
+    {
+      id: 'gingivalCondition',
+      type: 'buttonGroup',
+      label: 'Gingival condition:',
+      options: ['Healthy', 'Mild gingivitis', 'Moderate gingivitis', 'Severe gingivitis', 'Periodontitis'],
+      noteTemplate: (state, ls) => ls.value ? ('Gingival condition: ' + ls.value.toLowerCase() + '.') : null
+    },
+    {
+      id: 'recession',
+      type: 'buttonGroup',
+      label: 'Recession:',
+      options: ['None observed', 'Generalized', 'Localized'],
+      noteTemplate: (state, ls) => ls.value ? ('Recession: ' + ls.value.toLowerCase() + '.') : null
+    },
+    {
+      id: 'dentition',
+      type: 'compound',
+      label: 'Dentition:',
+      parts: [
+        { kind: 'pills', key: 'level', options: ['None', 'Minimally', 'Moderately', 'Heavily'] },
+        { kind: 'static', text: 'restored.' }
+      ],
+      noteTemplate: (state, ls) => ls.level ? ('Dentition: ' + ls.level.toLowerCase() + ' restored.') : null
+    },
+    {
+      id: 'caries',
+      type: 'toothInput',
+      label: 'Caries:',
+      nilOption: false,
+      placeholder: 'Tooth #(s)',
+      noteTemplate: (state, ls) => {
+        if (!ls.teeth || !ls.teeth.trim()) return null;
+        return 'Caries noted on tooth/teeth ' + ls.teeth.trim() + '.';
+      }
+    },
+    {
+      id: 'leakingRestorations',
+      type: 'toothInput',
+      label: 'Leaking / defective / dislodged restorations:',
+      nilOption: false,
+      placeholder: 'Tooth #(s)',
+      noteTemplate: (state, ls) => {
+        if (!ls.teeth || !ls.teeth.trim()) return null;
+        return 'Leaking / defective / dislodged restorations on tooth/teeth ' + ls.teeth.trim() + '.';
+      }
+    },
+    {
+      id: 'toothSurfaceLoss',
+      type: 'buttonGroup',
+      label: 'Tooth Surface Loss (attrition/abrasion/abfraction/erosion):',
+      options: ['None observed', 'Present'],
+      noteTemplate: (state, ls) => ls.value ? ('Tooth surface loss (attrition/abrasion/abfraction/erosion): ' + ls.value.toLowerCase() + '.') : null
+    },
+    {
+      id: 'prosthesesDE',
+      type: 'buttonGroup',
+      label: 'Prostheses:',
+      options: ['No', 'Yes'],
+      noteTemplate: (state, ls) => ls.value ? ('Prostheses: ' + ls.value + '.') : null
+    },
+    {
+      id: 'specialTests',
+      type: 'modalMultiSelect',
+      label: 'Special Tests (Endo/Perio):',
+      modalTitle: 'Select option',
+      options: ['None performed', 'Endo-Ice', 'Tenderness to percussion', 'Electric pulp test', 'Perio probing', 'Mobility', 'Furcation', 'Other'],
+      noteTemplate: (state, ls) => {
+        if (!ls.selected || ls.selected.length === 0) return null;
+        return 'Special tests (Endo/Perio): ' + ls.selected.join(', ') + '.';
+      }
+    },
+    {
+      id: 'eptPositive',
+      type: 'toothInput',
+      label: 'EPT: Positive response (control) on',
+      nilOption: false,
+      placeholder: 'Tooth #(s)',
+      noteTemplate: (state, ls) => {
+        if (!ls.teeth || !ls.teeth.trim()) return null;
+        return 'EPT: positive response (control) on tooth/teeth ' + ls.teeth.trim() + '.';
+      }
+    },
+    {
+      id: 'eptNegative',
+      type: 'toothInput',
+      label: 'EPT: Negative response on',
+      nilOption: false,
+      placeholder: 'Tooth #(s)',
+      noteTemplate: (state, ls) => {
+        if (!ls.teeth || !ls.teeth.trim()) return null;
+        return 'EPT: negative response on tooth/teeth ' + ls.teeth.trim() + '.';
+      }
+    },
+    {
+      id: 'endoIce',
+      type: 'compound',
+      label: 'Endo-Ice:',
+      parts: [
+        { kind: 'pills', key: 'response', options: ['Positive (<5 sec)', 'Prolonged (5 sec or more)', 'Hypersensitive (~5 sec)', 'Negative'] },
+        { kind: 'static', text: 'response on' },
+        { kind: 'text', key: 'teeth', placeholder: 'Tooth #(s)' }
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.response) return null;
+        let str = 'Endo-Ice: ' + ls.response.toLowerCase() + ' response';
+        if (ls.teeth && ls.teeth.trim()) str += ' on tooth/teeth ' + ls.teeth.trim();
+        return str + '.';
+      }
+    },
+    {
+      id: 'percussion',
+      type: 'compound',
+      label: 'Tenderness to percussion:',
+      parts: [
+        { kind: 'pills', key: 'response', options: ['Painful', 'Slightly hypersensitive', 'Normal'] },
+        { kind: 'static', text: 'response on' },
+        { kind: 'text', key: 'teeth', placeholder: 'Tooth #(s)' }
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.response) return null;
+        let str = 'Tenderness to percussion: ' + ls.response.toLowerCase() + ' response';
+        if (ls.teeth && ls.teeth.trim()) str += ' on tooth/teeth ' + ls.teeth.trim();
+        return str + '.';
+      }
+    },
+    {
+      id: 'deepPockets',
+      type: 'buttonGroup',
+      label: '',
+      hideLabel: true,
+      options: ['Generalized >4mm (see Perio Chart)', 'Localized'],
+      suffixText: 'deep pockets observed',
+      noteTemplate: (state, ls) => ls.value ? (ls.value + ' deep pockets observed.') : null
+    },
+    {
+      id: 'glickmanMobility',
+      type: 'modalMultiSelect',
+      label: "Glickman's tooth mobility grades:",
+      modalTitle: 'Select option',
+      options: ['Grade 0 - No mobility', 'Grade I - Slight mobility (<1mm)', 'Grade II - Moderate mobility (1-2mm)', 'Grade III - Severe mobility (>2mm, vertical)'],
+      noteTemplate: (state, ls) => {
+        if (!ls.selected || ls.selected.length === 0) return null;
+        return "Glickman's tooth mobility grade: " + ls.selected.join(', ') + '.';
+      }
+    },
+    {
+      id: 'furcationIndex',
+      type: 'modalMultiSelect',
+      label: 'Furcation index:',
+      modalTitle: 'Select option',
+      options: ['Class I - Incipient', 'Class II - Moderate', 'Class III - Through-and-through (not visible)', 'Class IV - Through-and-through (visible)'],
+      noteTemplate: (state, ls) => {
+        if (!ls.selected || ls.selected.length === 0) return null;
+        return 'Furcation index: ' + ls.selected.join(', ') + '.';
+      }
+    },
+    {
+      id: 'wisdomTeeth',
+      type: 'compound',
+      label: 'Wisdom teeth:',
+      parts: [
+        { kind: 'select', key: 'status', placeholder: 'Select option', options: ['Impacted', 'Partially erupted', 'Supraerupted', 'Fully erupted, no issues', 'Missing/extracted'] },
+        { kind: 'text', key: 'teeth', placeholder: 'Tooth#' }
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.status) return null;
+        let str = 'Wisdom teeth: ' + ls.status.toLowerCase();
+        if (ls.teeth && ls.teeth.trim()) str += ' (tooth #' + ls.teeth.trim() + ')';
+        return str + '.';
+      }
+    },
+    {
+      id: 'toothLoss',
+      type: 'toothInput',
+      label: 'Tooth loss:',
+      nilOption: false,
+      placeholder: 'Tooth #(s)',
+      noteTemplate: (state, ls) => {
+        if (!ls.teeth || !ls.teeth.trim()) return null;
+        return 'Tooth loss: tooth/teeth ' + ls.teeth.trim() + '.';
+      }
+    }
+  ]
+},
+
+/* ============================================================
+   7. RADIOGRAPHS
+============================================================ */
+{
+  id: 'radiographs',
+  title: 'Radiographs',
+  intro: null,
+  lines: [
+    {
+      id: 'xrayType',
+      type: 'buttonGroupOther',
+      label: 'X-rays:',
+      options: ['FMX', 'BWs and PAs', 'PAs', 'Not indicated today', 'Taken to screen for caries, periapical pathosis, root morphology and to assess periodontal bone levels', 'Not taken as planned because of strong gagging reflex'],
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        if (ls.value === 'FMX' || ls.value === 'BWs and PAs' || ls.value === 'PAs') {
+          return 'X-rays: ' + ls.value + ' taken. Taken to screen for caries, periapical pathosis, root morphology and to assess periodontal bone levels.';
+        }
+        return 'X-rays: ' + ls.value.charAt(0).toLowerCase() + ls.value.slice(1) + '.';
+      }
+    }
+  ]
+},
+
+/* ============================================================
+   8. DIAGNOSIS
+============================================================ */
+{
+  id: 'diagnosis',
+  title: 'Diagnosis',
+  intro: null,
+  lines: [
+    {
+      id: 'options',
+      type: 'modalMultiSelect',
+      label: '',
+      hideLabel: true,
+      buttonLabel: 'Options',
+      modalTitle: 'Options',
+      options: [
+        'Healthy with no issue', 'Symptomatic irreversible pulpitis', 'Asymptomatic irreversible pulpitis',
+        'Acute apical abscess', 'Chronic apical periodontitis', 'Wisdom tooth issues including pericoronitis',
+        'Alveolar Osteitis (Dry socket)', 'TMD', 'Periodontal Abscess', 'Dentin hypersensitivity',
+        'Tooth fracture', 'Unrestorable tooth/Retained root', 'Other'
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.selected || ls.selected.length === 0) return null;
+        const list = ls.selected.map(r => {
+          if (r === 'Other' && ls.otherText && ls.otherText.trim()) return ls.otherText.trim();
+          return r;
+        });
+        return 'Diagnosis: ' + list.join(', ') + '.';
+      }
+    }
+  ]
+},
+
+/* ============================================================
+   9. DISCUSSION
+   Note: discussion blocks for TMD / Dry socket / Dentin hypersensitivity /
+   Tooth fracture / Tooth extraction are linked to Diagnosis selections
+   and are rendered dynamically (see engine.js renderDiscussionBlocks).
+============================================================ */
+{
+  id: 'discussion',
+  title: 'Discussion',
+  intro: 'Verbal estimate given of costs as per treatment plan. Advised this is an estimated cost and this may change. Any changes or additions will be discussed. Patient',
+  lines: [
+    {
+      id: 'patientResponse',
+      type: 'buttonGroup',
+      label: '',
+      hideLabel: true,
+      options: ['understood and accepted', 'refused'],
+      suffixText: 'to have proposed treatment considering the standard of care.',
+      noteTemplate: (state, ls) => {
+        if (!ls.value) return null;
+        return 'Patient ' + ls.value + ' to have proposed treatment considering the standard of care.';
+      }
+    }
+    // dynamic diagnosis-linked discussion blocks are appended by the engine
+  ]
+},
+
+/* ============================================================
+   10. TREATMENT PLAN
+============================================================ */
+{
+  id: 'treatmentPlan',
+  title: 'Treatment Plan',
+  intro: 'Comprehensive exam will be performed next time.',
+  lines: [
+    {
+      id: 'crown',
+      type: 'toothInput',
+      label: 'Crown:',
+      nilOption: false,
+      placeholder: 'Tooth #(s)',
+      noteTemplate: (state, ls) => {
+        if (!ls.teeth || !ls.teeth.trim()) return null;
+        return 'Crown planned for tooth/teeth ' + ls.teeth.trim() + '.';
+      }
+    },
+    {
+      id: 'onlay',
+      type: 'toothInput',
+      label: 'Onlay:',
+      nilOption: false,
+      placeholder: 'Tooth #(s)',
+      noteTemplate: (state, ls) => {
+        if (!ls.teeth || !ls.teeth.trim()) return null;
+        return 'Onlay planned for tooth/teeth ' + ls.teeth.trim() + '.';
+      }
+    },
+    {
+      id: 'veneer',
+      type: 'toothInput',
+      label: 'Veneer:',
+      nilOption: false,
+      placeholder: 'Tooth #(s)',
+      noteTemplate: (state, ls) => {
+        if (!ls.teeth || !ls.teeth.trim()) return null;
+        return 'Veneer planned for tooth/teeth ' + ls.teeth.trim() + '.';
+      }
+    },
+    {
+      id: 'conventionalBridge',
+      type: 'compound',
+      label: 'Conventional bridge:',
+      parts: [
+        { kind: 'text', key: 'from', placeholder: 'Tooth #(s)' },
+        { kind: 'static', text: 'to' },
+        { kind: 'text', key: 'to', placeholder: 'Tooth #(s)' }
+      ],
+      noteTemplate: (state, ls) => {
+        if ((!ls.from || !ls.from.trim()) && (!ls.to || !ls.to.trim())) return null;
+        const fromStr = ls.from && ls.from.trim() ? ls.from.trim() : '___';
+        const toStr = ls.to && ls.to.trim() ? ls.to.trim() : '___';
+        return 'Conventional bridge planned from tooth ' + fromStr + ' to tooth ' + toStr + '.';
+      }
+    },
+    {
+      id: 'denture',
+      type: 'compound',
+      label: '',
+      hideLabel: true,
+      parts: [
+        { kind: 'pills', key: 'type', options: ['Partial', 'Full'] },
+        { kind: 'static', text: ',' },
+        { kind: 'pills', key: 'arch', options: ['upper', 'lower', 'upper and lower'] },
+        { kind: 'static', text: 'denture' }
+      ],
+      noteTemplate: (state, ls) => {
+        if (!ls.type && !ls.arch) return null;
+        let str = '';
+        if (ls.type) str += ls.type + ' ';
+        if (ls.arch) str += ls.arch + ' ';
+        return (str.trim() + ' denture planned.').replace(/\s+/g, ' ');
+      }
+    }
+  ]
+},
+
+/* ============================================================
+   11. NEXT VISIT
+============================================================ */
+{
+  id: 'nextVisit',
+  title: 'Next Visit',
+  intro: null,
+  lines: [
+    {
+      id: 'nextProcedure',
+      type: 'modalMultiSelect',
+      label: 'Next planned procedure:',
+      modalTitle: 'Select options',
+      inlinePills: true,
+      options: ['Comprehensive exam and cleaning', 'Composite', 'Core build-up', 'Crown prep', 'Impression', 'Extraction', 'Follow-up', 'SRPs', 'Endo referral', 'Perio referral', 'Other'],
+      noteTemplate: (state, ls) => {
+        if (!ls.selected || ls.selected.length === 0) return null;
+        const list = ls.selected.map(r => {
+          if (r === 'Other' && ls.otherText && ls.otherText.trim()) return ls.otherText.trim();
+          return r;
+        });
+        return 'Next planned procedure: ' + list.join(', ') + '.';
+      }
+    }
+  ]
+}
+
+];
+
+
+/* ============================================================
+   DIAGNOSIS -> DISCUSSION LINKED BLOCKS
+   Each entry's key matches a "Diagnosis" option string.
+   When that diagnosis is selected, the corresponding discussion
+   block is rendered in the Discussion section.
+============================================================ */
+const DIAGNOSIS_DISCUSSION_MAP = {
+
+  'TMD': {
+    tag: '<TMD>',
+    parts: [
+      { kind: 'static', text: 'Conservative advice and diagnosis of TMD given - advised to' },
+      { kind: 'select', key: 'tmdAdvice', placeholder: 'Select option', options: ['rest the jaw', 'use warm compresses', 'use a soft diet', 'wear a night guard'] }
+    ],
+    body: (ls) => {
+      let lead = 'Conservative advice and diagnosis of TMD given - advised';
+      if (ls.tmdAdvice) lead += ' to ' + ls.tmdAdvice;
+      lead += ' to alleviate jaw/muscle pain and to increase the range of mouth opening.';
+      return lead + ' Also advised to support the jaw with a fist when yawning, cut up foods, try bilateral chewing, and avoid unnecessary chewing such as gum, nails, and pencils while the pain and limited mouth opening exist. Be conscious of grinding/clenching. Make a conscious effort to reduce daily stress levels, and take an active approach to managing long-term stress-inducing factors in life. Take a small amount of time every day to go through self-guided jaw rehabilitation/relaxation techniques/meditation. Frequent exercise is very effective for managing stress. Be wary of weightlifting and swimming as this often encourages clenching teeth. Patient was also advised to go to the TMD specialist if the symptoms persist.';
+    }
+  },
+
+  'Alveolar Osteitis (Dry socket)': {
+    tag: '<Dry socket>',
+    parts: [],
+    body: (ls) => {
+      return 'The following explanations were given to the patient: This dry socket (osteitis) can happen after the extraction of a tooth. The risk is increased if the extraction was very difficult or if the patient is a smoker among other reasons. The clot that was in the tooth socket has come away revealing the bone, this has then caused the bone to become inflamed and that is what is causing the pain. The area will be rinsed with saline/antimicrobial solution and antibiotics and pain medication will be prescribed. The condition will heal itself over a week or so but if the condition is not improved in a week or so, either another type of antibiotics will be prescribed or socket debridement under local anesthesia may be performed.';
+    }
+  },
+
+  'Dentin hypersensitivity': {
+    tag: '<Dentin hypersensitivity>',
+    parts: [
+      { kind: 'static', text: 'Advised that painful sensations are being caused by sensitive teeth as a result of' },
+      { kind: 'select', key: 'cause', placeholder: 'Select option', options: ['exposed dentin', 'gum recession', 'enamel wear', 'recent restorative work'] }
+    ],
+    body: (ls) => {
+      let lead = 'Advised that painful sensations are being caused by sensitive teeth';
+      if (ls.cause) lead += ' as a result of ' + ls.cause;
+      lead += '.';
+      return lead + ' Sensodyne Rapid Relief toothpaste is recommended long-term to help manage the symptoms. In addition, the patient was informed to opt for a desensitizer application (F-varnish) to help block sensitive dentine or composite fillings to cover the affected area if the symptom persists or the abfraction progresses. Also advised the F-varnish may not be covered by insurance and it will likely only have a temporary effect and will need refreshing every couple of months if pt wishes to maintain the effect. Another treatment option includes a gum graft to cover the exposed root surface.';
+    }
+  },
+
+  'Tooth fracture': {
+    tag: '<Tooth fracture>',
+    parts: [
+      { kind: 'static', text: 'Informed the patient that the tooth' },
+      { kind: 'text', key: 'teeth', placeholder: 'Tooth #(s)' },
+      { kind: 'pills', key: 'outcome', options: [
+        'will be treated with composite restoration because the pulp can be saved. However, the tooth needs periodical follow-up to see if the pulp necrosis develops in the future. RCT would be needed if it becomes non-vital.',
+        'needs RCT followed by build-up and crown because the pulp is infected.',
+        'needs to be temporarily fixed to the adjacent teeth for 2-4 weeks.',
+        'needs to be extracted due to the minimal remaining structure supragingivally.'
+      ]}
+    ],
+    body: (ls) => {
+      let lead = 'Informed the patient that the tooth';
+      if (ls.teeth && ls.teeth.trim()) lead += ' ' + ls.teeth.trim();
+      if (ls.outcome) {
+        lead += ' ' + ls.outcome;
+      } else {
+        lead += ' ___.';
+      }
+      return lead;
+    }
+  },
+
+  'Unrestorable tooth/Retained root': {
+    tag: '<Tooth extraction>',
+    parts: [
+      { kind: 'static', text: 'Advised that nothing can be done to restore' },
+      { kind: 'text', key: 'teeth', placeholder: 'Tooth #(s)' }
+    ],
+    body: (ls) => {
+      let lead = 'Advised that nothing can be done to restore';
+      if (ls.teeth && ls.teeth.trim()) {
+        lead += ' tooth/teeth ' + ls.teeth.trim();
+      } else {
+        lead += ' the affected tooth/teeth';
+      }
+      lead += ' and the only treatment option is tooth extraction. Advised that if no treatment is provided there is a significant risk of pain, infection, bone loss, or even death. The subsequent treatment options after the tooth loss were explained including Implant along with possible ridge augmentation, dental bridge, dentures, and no tooth replacement. Advantages and disadvantages were also fully explained to the patient. No tooth replacement option has the benefit of no immediate financial expense but it involves some risks such as reduced eating/speaking function, especially if other teeth already missing. Adjacent/opposing teeth may drift/tilt into space making it more difficult (or not possible) to replace the gap in the future. Implants are fixed in place with a titanium screw and do not involve damaging the adjacent teeth to place, it will help to maintain bone levels and provides excellent function and aesthetics in favorable cases. For these reasons and others, it is often considered the gold standard tooth replacement. However, there are possible risks including surgical procedure, oral health should be stable, an implant can get peri-implantitis if high standards of OH are not maintained, which is difficult to treat and may mean the implant has to be taken out, may take several months before a crown is fitted after implant placement, referral for consultation needed first to assess suitability for implants.';
+      return lead;
+    }
+  },
+
+  'Symptomatic irreversible pulpitis': {
+    tag: '<Symptomatic irreversible pulpitis>',
+    parts: [
+      { kind: 'static', text: 'Advised that tooth' },
+      { kind: 'text', key: 'teeth', placeholder: 'Tooth #(s)' },
+      { kind: 'pills', key: 'plan', options: [
+        'needs RCT followed by build-up and crown to save the tooth.',
+        'needs RCT followed by a filling/build-up.',
+        'has a poor prognosis and extraction is recommended.'
+      ]}
+    ],
+    body: (ls) => {
+      const toothRef = (ls.teeth && ls.teeth.trim()) ? ('tooth ' + ls.teeth.trim()) : 'the affected tooth';
+      let lead = 'Advised that the pulp inside ' + toothRef;
+      lead += ' is irreversibly inflamed and causing the symptomatic pain, and';
+      if (ls.plan) {
+        lead += ' the tooth ' + ls.plan;
+      } else {
+        lead += ' the tooth ___.';
+      }
+      lead += ' Explained that without treatment the infection can spread, causing an abscess, swelling, and bone loss. Advised that pain medication can be taken in the interim and to avoid chewing on the affected side. Patient was informed that root canal treatment removes the inflamed/infected pulp tissue, and that a crown is often recommended afterwards to protect the remaining tooth structure from fracture.';
+      return lead;
+    }
+  },
+
+  'Asymptomatic irreversible pulpitis': {
+    tag: '<Asymptomatic irreversible pulpitis>',
+    parts: [
+      { kind: 'static', text: 'Advised that tooth' },
+      { kind: 'text', key: 'teeth', placeholder: 'Tooth #(s)' },
+      { kind: 'pills', key: 'plan', options: [
+        'needs RCT followed by build-up and crown to save the tooth.',
+        'needs RCT followed by a filling/build-up.',
+        'has a poor prognosis and extraction is recommended.'
+      ]}
+    ],
+    body: (ls) => {
+      const toothRef = (ls.teeth && ls.teeth.trim()) ? ('tooth ' + ls.teeth.trim()) : 'the affected tooth';
+      let lead = 'Advised that the pulp inside ' + toothRef;
+      lead += ' is irreversibly inflamed, even though it is not currently causing pain, and';
+      if (ls.plan) {
+        lead += ' the tooth ' + ls.plan;
+      } else {
+        lead += ' the tooth ___.';
+      }
+      lead += ' Explained that the condition can become symptomatic or progress to an abscess if left untreated, and that root canal treatment removes the inflamed/infected pulp tissue. A crown is often recommended afterwards to protect the remaining tooth structure from fracture. Patient understood that delaying treatment carries a risk of the tooth becoming painful or infected in the future.';
+      return lead;
+    }
+  },
+
+  'Acute apical abscess': {
+    tag: '<Acute apical abscess>',
+    parts: [
+      { kind: 'static', text: 'Advised that tooth' },
+      { kind: 'text', key: 'teeth', placeholder: 'Tooth #(s)' },
+      { kind: 'pills', key: 'plan', options: [
+        'will be treated with RCT to drain the infection and save the tooth.',
+        'needs to be extracted as the only option to resolve the infection.',
+        'requires incision and drainage in addition to RCT/extraction.'
+      ]}
+    ],
+    body: (ls) => {
+      const toothRef = (ls.teeth && ls.teeth.trim()) ? ('tooth ' + ls.teeth.trim()) : 'the affected tooth';
+      let lead = 'Advised that ' + toothRef;
+      lead += ' has an acute infection at the root tip causing pain, swelling, and/or a draining sinus, and';
+      if (ls.plan) {
+        lead += ' ' + ls.plan;
+      } else {
+        lead += ' ___.';
+      }
+      lead += ' Explained that antibiotics may be prescribed if there is spreading infection, fever, or systemic involvement, but antibiotics alone will not resolve the infection without definitive dental treatment. Advised that if left untreated, the infection can spread to surrounding tissues, fascial spaces, or in rare cases become a medical emergency. Patient was advised to seek urgent care if swelling worsens, spreads to the eye/neck/floor of mouth, or if breathing or swallowing becomes difficult.';
+      return lead;
+    }
+  },
+
+  'Chronic apical periodontitis': {
+    tag: '<Chronic apical periodontitis>',
+    parts: [
+      { kind: 'static', text: 'Advised that tooth' },
+      { kind: 'text', key: 'teeth', placeholder: 'Tooth #(s)' },
+      { kind: 'pills', key: 'plan', options: [
+        'needs RCT followed by build-up and crown to resolve the infection and save the tooth.',
+        'needs RCT followed by a filling/build-up.',
+        'has a poor prognosis and extraction is recommended.'
+      ]}
+    ],
+    body: (ls) => {
+      const toothRef = (ls.teeth && ls.teeth.trim()) ? ('tooth ' + ls.teeth.trim()) : 'the affected tooth';
+      let lead = 'Advised that the radiograph shows a chronic, low-grade infection at the root tip of ' + toothRef;
+      lead += ', likely from a non-vital/necrotic pulp, and';
+      if (ls.plan) {
+        lead += ' the tooth ' + ls.plan;
+      } else {
+        lead += ' the tooth ___.';
+      }
+      lead += ' Explained that although it may not be currently painful, the infection will not resolve on its own and can flare up into an acute infection or cause further bone loss over time. Root canal treatment removes the source of infection from inside the tooth, allowing the bone to heal. A crown is often recommended afterwards to protect the remaining tooth structure from fracture.';
+      return lead;
+    }
+  },
+
+  'Wisdom tooth issues including pericoronitis': {
+    tag: '<Wisdom tooth issues>',
+    parts: [
+      { kind: 'static', text: 'Advised that tooth' },
+      { kind: 'text', key: 'teeth', placeholder: 'Tooth #(s)' },
+      { kind: 'pills', key: 'plan', options: [
+        'should be monitored with good oral hygiene and warm salt water rinses for now.',
+        'should be referred for extraction due to recurrent pericoronitis/impaction.',
+        'requires antibiotics in addition to local cleaning before referral for extraction.'
+      ]}
+    ],
+    body: (ls) => {
+      let lead = 'Advised that the wisdom tooth';
+      if (ls.teeth && ls.teeth.trim()) lead += ' (tooth ' + ls.teeth.trim() + ')';
+      lead += ' has inflamed/infected gum tissue around it (pericoronitis), often due to partial eruption or impaction trapping food and bacteria, and';
+      if (ls.plan) {
+        lead += ' ' + ls.plan;
+      } else {
+        lead += ' ___.';
+      }
+      lead += ' Explained that pericoronitis can recur, especially with stress or upper respiratory infections, and may cause swelling, trismus (difficulty opening the mouth), and pain. Advised on cleaning under the gum flap with a soft brush/syringe and the use of warm salt water rinses. If symptoms worsen (spreading swelling, fever, difficulty swallowing), advised to seek urgent care.';
+      return lead;
+    }
+  },
+
+  'Periodontal Abscess': {
+    tag: '<Periodontal Abscess>',
+    parts: [
+      { kind: 'static', text: 'Advised that tooth' },
+      { kind: 'text', key: 'teeth', placeholder: 'Tooth #(s)' },
+      { kind: 'pills', key: 'plan', options: [
+        'will be treated with drainage and local debridement/scaling today.',
+        'requires referral to a periodontist for further management.',
+        'requires antibiotics in addition to local debridement.'
+      ]}
+    ],
+    body: (ls) => {
+      const toothRef = (ls.teeth && ls.teeth.trim()) ? ('tooth ' + ls.teeth.trim()) : 'the affected tooth';
+      let lead = 'Advised that there is a localized infection within the gum pocket (periodontal abscess) at ' + toothRef;
+      lead += ', associated with periodontal disease, and';
+      if (ls.plan) {
+        lead += ' ' + ls.plan;
+      } else {
+        lead += ' ___.';
+      }
+      lead += ' Explained that this differs from an abscess originating from the tooth pulp, and is managed by draining the pocket and removing the bacterial deposits (plaque/calculus) causing the infection. Advised that ongoing periodontal maintenance and improved home oral hygiene are important to prevent recurrence, and that if left untreated the infection can contribute to further bone and attachment loss around the tooth.';
+      return lead;
+    }
+  }
+
+};
+
+
+/* ============================================================
+   HELPER FUNCTIONS
+============================================================ */
+const SECTIONS_HELPERS = {
+  findSection: (sectionId) => SECTIONS.find(s => s.id === sectionId),
+  findLine: (sectionId, lineId) => {
+    const sec = SECTIONS.find(s => s.id === sectionId);
+    if (!sec) return null;
+    return sec.lines.find(l => l.id === lineId);
+  },
+  findOption: (sectionId, lineId, value) => {
+    const line = SECTIONS_HELPERS.findLine(sectionId, lineId);
+    if (!line || !line.options) return null;
+    return line.options.find(o => (typeof o === 'object' ? o.value === value : o === value));
+  }
+};
+
+</script>
+<script>
+/* ============================================================
+   DENTAL NOTE BUILDER - RENDERING ENGINE
+   ============================================================ */
+
+(function () {
+
+  /* ------------------------------------------------------------
+     STATE
+     state.sections[sectionId] = {
+       skipped: bool,
+       lines: { [lineId]: { exists: bool, ...lineState } }
+     }
+  ------------------------------------------------------------ */
+  const state = { sections: {} };
+
+  function initState() {
+    state.sections = {};
+    SECTIONS.forEach(sec => {
+      const lineStates = {};
+      sec.lines.forEach(line => {
+        lineStates[line.id] = { exists: true, ...defaultLineState(line) };
+      });
+      state.sections[sec.id] = { skipped: false, lines: lineStates, order: sec.lines.map(l => l.id), customLines: [] };
+    });
+  }
+
+  function defaultLineState(line) {
+    switch (line.type) {
+      case 'vitals':
+        return { bp: '', wrist: '', pulse: '', bt: '' };
+      case 'buttonGroup':
+        return { value: '' };
+      case 'buttonGroupOther':
+        return { value: '', otherText: '' };
+      case 'buttonGroupLesion':
+        return { value: '', lesionText: '' };
+      case 'multiButtonGroup':
+        return { selected: [] };
+      case 'dropdown':
+        return { value: '' };
+      case 'dropdownDescriptive':
+        return { value: '' };
+      case 'modalMultiSelect':
+        return { selected: [], otherText: '' };
+      case 'toothInput':
+        return { teeth: '' };
+      case 'compound': {
+        const ls = {};
+        (line.parts || []).forEach(p => {
+          if (p.kind === 'pills' || p.kind === 'pillsLesion' || p.kind === 'select') ls[p.key] = '';
+          if (p.kind === 'multiPills') ls[p.key] = [];
+          if (p.kind === 'text') ls[p.key] = '';
+          if (p.kind === 'pillsLesion') ls['lesionText'] = '';
+        });
+        return ls;
+      }
+      default:
+        return {};
+    }
+  }
+
+  /* ------------------------------------------------------------
+     DOM HELPERS
+  ------------------------------------------------------------ */
+  function el(tag, props = {}, children = []) {
+    const node = document.createElement(tag);
+    Object.entries(props).forEach(([k, v]) => {
+      if (k === 'class') node.className = v;
+      else if (k === 'text') node.textContent = v;
+      else if (k.startsWith('on') && typeof v === 'function') node.addEventListener(k.slice(2).toLowerCase(), v);
+      else if (v !== null && v !== undefined) node.setAttribute(k, v);
+    });
+    children.forEach(c => { if (c) node.appendChild(c); });
+    return node;
+  }
+
+  function makeRemoveBtn(onRemove) {
+    return el('button', { class: 'remove-btn', text: '\u00d7', title: 'Remove this line', onClick: onRemove });
+  }
+
+  function makePillGroup(options, selectedValue, onSelect) {
+    const wrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+    options.forEach(opt => {
+      const optValue = typeof opt === 'object' ? opt.value : opt;
+      const optLabel = typeof opt === 'object' ? opt.label : opt;
+      const btn = el('button', {
+        class: 'pill' + (selectedValue === optValue ? ' active' : ''),
+        text: optLabel,
+        onClick: () => onSelect(selectedValue === optValue ? '' : optValue)
+      });
+      wrap.appendChild(btn);
+    });
+    return wrap;
+  }
+
+  function makeSelect(options, selectedValue, placeholder, onChange, wide) {
+    const select = el('select', wide ? { class: 'wide' } : {});
+    select.appendChild(el('option', { value: '', text: placeholder || 'Select your option' }));
+    options.forEach(opt => {
+      const optValue = typeof opt === 'object' ? opt.value : opt;
+      const optLabel = typeof opt === 'object' ? (opt.label || opt.value) : opt;
+      const o = el('option', { value: optValue, text: optLabel });
+      if (selectedValue === optValue) o.setAttribute('selected', 'selected');
+      select.appendChild(o);
+    });
+    select.addEventListener('change', (e) => onChange(e.target.value));
+    return select;
+  }
+
+  function makeTextInput(value, placeholder, onInput, cls) {
+    const input = el('input', { type: 'text', placeholder: placeholder || '' });
+    if (cls) input.classList.add(cls);
+    input.value = value || '';
+    input.addEventListener('input', (e) => onInput(e.target.value));
+    return input;
+  }
+
+
+  /* ------------------------------------------------------------
+     SHARED MULTI-SELECT MODAL
+  ------------------------------------------------------------ */
+  let modalCallback = null;
+  let modalSelection = [];
+
+  function openModal(title, options, currentSelection) {
+    modalSelection = [...currentSelection];
+    document.getElementById('modal-title').textContent = title || 'Select options';
+    const optionsContainer = document.getElementById('modal-options');
+    optionsContainer.innerHTML = '';
+
+    options.forEach(opt => {
+      const isSelected = modalSelection.includes(opt);
+      const pillEl = el('div', { class: 'modal-option' + (isSelected ? ' selected' : '') });
+      const circle = el('span', { text: isSelected ? '\u25cf' : '\u25cb', style: 'font-size:12px;' });
+      pillEl.appendChild(circle);
+      pillEl.appendChild(document.createTextNode(opt));
+      pillEl.addEventListener('click', () => {
+        if (modalSelection.includes(opt)) {
+          modalSelection = modalSelection.filter(o => o !== opt);
+        } else {
+          modalSelection.push(opt);
+        }
+        const nowSelected = modalSelection.includes(opt);
+        pillEl.classList.toggle('selected', nowSelected);
+        circle.textContent = nowSelected ? '\u25cf' : '\u25cb';
+        document.getElementById('modal-add-btn').disabled = modalSelection.length === 0;
+      });
+      optionsContainer.appendChild(pillEl);
+    });
+
+    document.getElementById('modal-add-btn').disabled = modalSelection.length === 0;
+    document.getElementById('select-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('select-modal').classList.remove('open');
+    modalCallback = null;
+  }
+
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('select-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'select-modal') closeModal();
+  });
+  document.getElementById('modal-add-btn').addEventListener('click', () => {
+    if (modalCallback) modalCallback([...modalSelection]);
+    closeModal();
+  });
+
+
+  /* ------------------------------------------------------------
+     LINE RENDERERS - one function per "type"
+     Each returns a DOM node for the line CONTENT (without the
+     remove button / wrapper); wrapper added by renderLine().
+  ------------------------------------------------------------ */
+
+  const LINE_RENDERERS = {
+
+    vitals: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      content.appendChild(el('span', { class: 'static-text', text: 'BP:' }));
+      content.appendChild(makeTextInput(ls.bp, '__ / __', (v) => { ls.bp = v; renderNote(); }, 'small'));
+      content.appendChild(el('span', { class: 'static-text', text: 'mmHg (' }));
+      content.appendChild(makePillGroup(['right', 'left'], ls.wrist, (v) => { ls.wrist = v; rerenderSection(sectionId); }));
+      content.appendChild(el('span', { class: 'static-text', text: 'wrist strap);' }));
+      content.appendChild(el('span', { class: 'static-text', text: 'Pulse:' }));
+      content.appendChild(makeTextInput(ls.pulse, 'Enter notes here...', (v) => { ls.pulse = v; renderNote(); }, 'small'));
+      content.appendChild(el('span', { class: 'static-text', text: 'bpm, regular;' }));
+      content.appendChild(el('span', { class: 'static-text', text: 'BT:' }));
+      content.appendChild(makeTextInput(ls.bt, 'Enter notes here...', (v) => { ls.bt = v; renderNote(); }, 'small'));
+      content.appendChild(el('span', { class: 'static-text', text: '\u00b0C' }));
+      return content;
+    },
+
+    buttonGroup: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      if (!line.hideLabel) content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      const pillWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+      line.options.forEach(opt => {
+        const optValue = typeof opt === 'object' ? opt.value : opt;
+        const optLabel = typeof opt === 'object' ? opt.label : opt;
+        const btn = el('button', {
+          class: 'pill' + (ls.value === optValue ? ' active' : ''),
+          text: optLabel,
+          onClick: () => {
+            const newVal = ls.value === optValue ? '' : optValue;
+            ls.value = newVal;
+            pillWrap.querySelectorAll('.pill').forEach(b => {
+              b.classList.toggle('active', b.textContent.trim() === newVal);
+            });
+            renderNote();
+          }
+        });
+        pillWrap.appendChild(btn);
+      });
+      content.appendChild(pillWrap);
+      if (line.suffixText) content.appendChild(el('span', { class: 'static-text', text: line.suffixText }));
+      return content;
+    },
+
+    buttonGroupOther: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      if (!line.hideLabel) content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      content.appendChild(makePillGroup(line.options, ls.value, (v) => { ls.value = v; rerenderSection(sectionId); }));
+      const otherTrigger = line.otherTriggerValue || 'Other';
+      if (ls.value === otherTrigger) {
+        content.appendChild(makeTextInput(ls.otherText, 'Specify...', (v) => { ls.otherText = v; renderNote(); }, 'grow'));
+      }
+      return content;
+    },
+
+    buttonGroupLesion: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      const allOptions = line.options.map(o => ({ value: o, label: o }));
+      allOptions.push({ value: 'lesion', label: line.lesionOptionLabel || 'A lesion was observed as follows:' });
+      content.appendChild(makePillGroup(allOptions, ls.value, (v) => { ls.value = v; rerenderSection(sectionId); }));
+      if (ls.value === 'lesion') {
+        content.appendChild(makeTextInput(ls.lesionText, 'Describe lesion...', (v) => { ls.lesionText = v; renderNote(); }, 'grow'));
+      }
+      return content;
+    },
+
+    dropdown: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      content.appendChild(makeSelect(line.options, ls.value, 'Select your option', (v) => { ls.value = v; renderNote(); }, line.wide));
+      if (line.suffix) content.appendChild(el('span', { class: 'static-text', text: line.suffix }));
+      return content;
+    },
+
+    dropdownDescriptive: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      const opts = line.options.map(o => ({ value: o.value, label: o.label }));
+      content.appendChild(makeSelect(opts, ls.value, 'Select your option', (v) => { ls.value = v; renderNote(); }, line.wide));
+      return content;
+    },
+
+    modalMultiSelect: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      if (!line.hideLabel) content.appendChild(el('span', { class: 'line-label', text: line.label }));
+
+      const btnLabel = line.buttonLabel || 'Select options';
+
+      const handleSelectionChange = (sel) => {
+        ls.selected = sel;
+        if (!ls.selected.includes('Other')) ls.otherText = '';
+        rerenderSection(sectionId);
+        // If this is the Diagnosis "options" line, the Discussion section
+        // has dynamic blocks linked to these selections - refresh it too.
+        if (sectionId === 'diagnosis' && line.id === 'options' && sectionId !== 'discussion') {
+          const discussionExists = SECTIONS.find(s => s.id === 'discussion');
+          if (discussionExists && !state.sections['discussion'].skipped) {
+            rerenderSection('discussion');
+          }
+        }
+      };
+
+      if (ls.selected.length === 0) {
+        const btn = el('button', { class: 'pill' });
+        btn.innerHTML = '\ud83d\udd17 ' + btnLabel + ' \u2295';
+        btn.addEventListener('click', () => {
+          openModal(line.modalTitle, line.options, ls.selected);
+          modalCallback = handleSelectionChange;
+        });
+        content.appendChild(btn);
+      } else {
+        ls.selected.forEach(s => {
+          content.appendChild(el('span', { class: 'pill active', text: s }));
+        });
+        if (ls.selected.includes('Other')) {
+          content.appendChild(makeTextInput(ls.otherText, 'Describe other...', (v) => { ls.otherText = v; renderNote(); }, 'grow'));
+        }
+        const editBtn = el('button', { class: 'pill', text: 'Edit' });
+        editBtn.addEventListener('click', () => {
+          openModal(line.modalTitle, line.options, ls.selected);
+          modalCallback = handleSelectionChange;
+        });
+        content.appendChild(editBtn);
+      }
+      return content;
+    },
+
+    toothInput: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'line-label', text: line.label }));
+      content.appendChild(makeTextInput(ls.teeth, line.placeholder || 'Tooth #(s)', (v) => { ls.teeth = v; renderNote(); }, 'medium'));
+      return content;
+    },
+
+    compound: (line, ls, sectionId) => {
+      const content = el('div', { class: 'line-content' });
+      if (!line.hideLabel && line.label) content.appendChild(el('span', { class: 'line-label', text: line.label }));
+
+      (line.parts || []).forEach(part => {
+        switch (part.kind) {
+          case 'static':
+            content.appendChild(el('span', { class: 'static-text', text: part.text }));
+            break;
+          case 'text':
+            content.appendChild(makeTextInput(ls[part.key], part.placeholder, (v) => { ls[part.key] = v; renderNote(); }, 'medium'));
+            break;
+          case 'select':
+            content.appendChild(makeSelect(part.options, ls[part.key], part.placeholder, (v) => { ls[part.key] = v; renderNote(); }));
+            break;
+          case 'pills': {
+            const pillWrap2 = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+            part.options.forEach(opt => {
+              const optValue = typeof opt === 'object' ? opt.value : opt;
+              const optLabel = typeof opt === 'object' ? opt.label : opt;
+              const btn = el('button', {
+                class: 'pill' + (ls[part.key] === optValue ? ' active' : ''),
+                text: optLabel,
+                onClick: () => {
+                  const newVal = ls[part.key] === optValue ? '' : optValue;
+                  ls[part.key] = newVal;
+                  pillWrap2.querySelectorAll('.pill').forEach(b => {
+                    b.classList.toggle('active', b.textContent.trim() === newVal);
+                  });
+                  renderNote();
+                }
+              });
+              pillWrap2.appendChild(btn);
+            });
+            content.appendChild(pillWrap2);
+            break;
+          }
+          case 'multiPills': {
+            const mpWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+            if (!Array.isArray(ls[part.key])) ls[part.key] = [];
+            part.options.forEach(opt => {
+              const isActive = ls[part.key].includes(opt);
+              const btn = el('button', {
+                class: 'pill' + (isActive ? ' active' : ''),
+                text: opt,
+                onClick: () => {
+                  if (!Array.isArray(ls[part.key])) ls[part.key] = [];
+                  if (ls[part.key].includes(opt)) {
+                    ls[part.key] = ls[part.key].filter(v => v !== opt);
+                  } else {
+                    ls[part.key] = [...ls[part.key], opt];
+                  }
+                  btn.classList.toggle('active', ls[part.key].includes(opt));
+                  renderNote();
+                }
+              });
+              mpWrap.appendChild(btn);
+            });
+            content.appendChild(mpWrap);
+            break;
+          }
+          case 'pillsLesion': {
+            const allOptions = part.options.map(o => ({ value: o, label: o }));
+            allOptions.push({ value: 'lesion', label: part.lesionLabel || 'A lesion was observed as follows:' });
+            content.appendChild(makePillGroup(allOptions, ls[part.key], (v) => { ls[part.key] = v; rerenderSection(sectionId); }));
+            if (ls[part.key] === 'lesion') {
+              content.appendChild(makeTextInput(ls.lesionText, 'Describe lesion...', (v) => { ls.lesionText = v; renderNote(); }, 'grow'));
+            }
+            break;
+          }
+        }
+      });
+
+      return content;
+    }
+
+  };
+
+
+  /* ------------------------------------------------------------
+     SECTION RENDERING
+  ------------------------------------------------------------ */
+
+  function renderLine(sec, line, sectionId) {
+    const sectionState = state.sections[sectionId];
+    const ls = sectionState.lines[line.id];
+    if (!ls.exists) return null;
+
+    const renderer = LINE_RENDERERS[line.type];
+    if (!renderer) return null;
+
+    const content = renderer(line, ls, sectionId);
+
+    const lineEl = el('div', { class: 'line' }, [
+      content,
+      makeRemoveBtn(() => {
+        ls.exists = false;
+        rerenderSection(sectionId);
+      })
+    ]);
+    return lineEl;
+  }
+
+  function renderSection(sec) {
+    const sectionState = state.sections[sec.id];
+
+    const card = el('div', { class: 'card', id: 'card-' + sec.id });
+    if (sectionState.skipped) card.classList.add('section-skipped');
+
+    const header = el('div', { class: 'card-header' });
+    header.appendChild(el('h2', { text: sec.title }));
+    const controls = el('div', { class: 'section-controls' });
+    const skipBtn = el('button', { class: 'skip-section-btn', text: 'Skip section' });
+    skipBtn.addEventListener('click', () => {
+      sectionState.skipped = true;
+      renderAll();
+    });
+    controls.appendChild(skipBtn);
+    header.appendChild(controls);
+    card.appendChild(header);
+
+    if (sec.intro) {
+      const introText = typeof sec.intro === 'function' ? sec.intro(state) : sec.intro;
+      card.appendChild(el('p', { class: 'intro-text', text: introText }));
+    }
+
+    // Restore pills for removed template lines
+    const removedLineIds = sectionState.order.filter(id => !sectionState.lines[id].exists);
+    if (removedLineIds.length > 0) {
+      const restoreWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;' });
+      removedLineIds.forEach(lineId => {
+        const line = sec.lines.find(l => l.id === lineId);
+        const restoreLabel = (line.label && line.label.trim()) ? line.label.replace(/[:\s]+$/, '') : 'line';
+        const btn = el('button', { class: 'pill', text: '+ Restore: ' + restoreLabel });
+        btn.addEventListener('click', () => {
+          sectionState.lines[lineId].exists = true;
+          rerenderSection(sec.id);
+        });
+        restoreWrap.appendChild(btn);
+      });
+      card.appendChild(restoreWrap);
+    }
+
+    const linesContainer = el('div', { id: 'lines-' + sec.id });
+    sectionState.order.forEach(lineId => {
+      const line = sec.lines.find(l => l.id === lineId);
+      const lineEl = renderLine(sec, line, sec.id);
+      if (lineEl) linesContainer.appendChild(lineEl);
+    });
+
+    // Custom free-text comment lines (added via "+ Add line")
+    sectionState.customLines.forEach((customLine, idx) => {
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(makeTextInput(customLine.text, 'Type additional note...', (v) => {
+        customLine.text = v;
+        renderNote();
+      }, 'grow'));
+
+      const lineEl = el('div', { class: 'line' }, [
+        content,
+        makeRemoveBtn(() => {
+          sectionState.customLines.splice(idx, 1);
+          rerenderSection(sec.id);
+        })
+      ]);
+      linesContainer.appendChild(lineEl);
+    });
+
+    card.appendChild(linesContainer);
+
+    // Special: dynamic discussion blocks linked to diagnosis
+    if (sec.id === 'discussion') {
+      const dynBlocks = renderDiscussionBlocks();
+      dynBlocks.forEach(b => card.appendChild(b));
+    }
+
+    // "Add line" button - always active; adds a free-text comment line
+    const addBtn = el('button', { class: 'add-line-btn' });
+    addBtn.innerHTML = '<span class="icon-circle">+</span> Add line';
+    addBtn.addEventListener('click', () => {
+      sectionState.customLines.push({ text: '' });
+      rerenderSection(sec.id);
+    });
+    card.appendChild(addBtn);
+
+    return card;
+  }
+
+  function rerenderSection(sectionId) {
+    const sec = SECTIONS.find(s => s.id === sectionId);
+    const oldCard = document.getElementById('card-' + sectionId);
+    const newCard = renderSection(sec);
+    if (oldCard) oldCard.replaceWith(newCard);
+    renderNote();
+    renderSkippedTray();
+  }
+
+
+  /* ------------------------------------------------------------
+     DISCUSSION DYNAMIC BLOCKS (linked to Diagnosis selections)
+  ------------------------------------------------------------ */
+
+  // persistent state for discussion sub-blocks, keyed by diagnosis label
+  const discussionBlockState = {};
+
+  function getDiagnosisSelections() {
+    const diagSection = state.sections['diagnosis'];
+    if (!diagSection || diagSection.skipped) return [];
+    const ls = diagSection.lines['options'];
+    if (!ls || !ls.exists) return [];
+    return ls.selected || [];
+  }
+
+  function renderDiscussionBlocks() {
+    const selections = getDiagnosisSelections();
+    const blocks = [];
+
+    selections.forEach(diagLabel => {
+      const mapping = DIAGNOSIS_DISCUSSION_MAP[diagLabel];
+      if (!mapping) return;
+
+      if (!discussionBlockState[diagLabel]) {
+        const initial = {};
+        (mapping.parts || []).forEach(p => {
+          if (p.kind === 'select' || p.kind === 'pills' || p.kind === 'text') initial[p.key] = '';
+        });
+        discussionBlockState[diagLabel] = initial;
+      }
+      const ls = discussionBlockState[diagLabel];
+
+      const block = el('div', { class: 'discussion-block' });
+      const content = el('div', { class: 'line-content' });
+      content.appendChild(el('span', { class: 'diag-tag', text: mapping.tag }));
+
+      (mapping.parts || []).forEach(part => {
+        switch (part.kind) {
+          case 'static':
+            content.appendChild(el('span', { class: 'static-text', text: part.text }));
+            break;
+          case 'text':
+            content.appendChild(makeTextInput(ls[part.key], part.placeholder, (v) => { ls[part.key] = v; renderNote(); }, 'medium'));
+            break;
+          case 'select':
+            content.appendChild(makeSelect(part.options, ls[part.key], part.placeholder, (v) => { ls[part.key] = v; renderNote(); }));
+            break;
+          case 'pills': {
+            const dpWrap = el('div', { style: 'display:flex; flex-wrap:wrap; gap:8px;' });
+            part.options.forEach(opt => {
+              const shortLabel = opt.length > 60 ? opt.slice(0, 57) + '...' : opt;
+              const btn = el('button', {
+                class: 'pill' + (ls[part.key] === opt ? ' active' : ''),
+                text: shortLabel,
+                onClick: () => {
+                  const newVal = ls[part.key] === opt ? '' : opt;
+                  ls[part.key] = newVal;
+                  dpWrap.querySelectorAll('.pill').forEach(b => {
+                    b.classList.toggle('active', b.textContent.trim() === (newVal.length > 60 ? newVal.slice(0,57)+'...' : newVal));
+                  });
+                  // update body text preview
+                  const preview = block.querySelector('p.static-text');
+                  if (preview) preview.textContent = mapping.body(ls);
+                  renderNote();
+                }
+              });
+              dpWrap.appendChild(btn);
+            });
+            content.appendChild(dpWrap);
+            break;
+          }
+        }
+      });
+
+      block.appendChild(content);
+
+      // preview of generated body text for this block
+      const bodyText = mapping.body(ls);
+      block.appendChild(el('p', { class: 'static-text', style: 'margin: 8px 0 0; color: var(--text-muted);', text: bodyText }));
+
+      blocks.push(block);
+    });
+
+    return blocks;
+  }
+
+
+  /* ------------------------------------------------------------
+     SKIPPED SECTIONS TRAY
+  ------------------------------------------------------------ */
+
+  function renderSkippedTray() {
+    const tray = document.getElementById('skipped-tray');
+    const list = document.getElementById('skipped-list');
+    list.innerHTML = '';
+
+    const skipped = SECTIONS.filter(sec => state.sections[sec.id].skipped);
+    if (skipped.length === 0) {
+      tray.classList.add('empty');
+      return;
+    }
+    tray.classList.remove('empty');
+
+    skipped.forEach(sec => {
+      const btn = el('button', { class: 'restore-pill' });
+      btn.innerHTML = '<i>+</i> Restore: ' + sec.title;
+      btn.addEventListener('click', () => {
+        state.sections[sec.id].skipped = false;
+        renderAll();
+      });
+      list.appendChild(btn);
+    });
+  }
+
+
+  /* ------------------------------------------------------------
+     NOTE GENERATION
+  ------------------------------------------------------------ */
+
+  function renderNote() {
+    const noteParts = [];
+
+    SECTIONS.forEach(sec => {
+      const sectionState = state.sections[sec.id];
+      if (sectionState.skipped) return;
+
+      const sectionLines = [];
+
+      // intro text
+      if (sec.intro && sec.id !== 'discussion') {
+        const introText = typeof sec.intro === 'function' ? sec.intro(state) : sec.intro;
+        sectionLines.push(introText);
+      }
+
+      sectionState.order.forEach(lineId => {
+        const line = sec.lines.find(l => l.id === lineId);
+        const ls = sectionState.lines[lineId];
+        if (!ls.exists) return;
+        const text = line.noteTemplate(state, ls);
+        if (text) sectionLines.push(text);
+      });
+
+      // custom free-text comment lines
+      const customTexts = sectionState.customLines
+        .map(cl => cl.text && cl.text.trim())
+        .filter(t => t);
+
+      // discussion section: intro + patient response + dynamic blocks
+      if (sec.id === 'discussion') {
+        // intro already pushed above? no - skip it there, handle here for ordering
+      }
+
+      if (sec.id === 'discussion') {
+        const discussionLines = [];
+        if (sec.intro) discussionLines.push(typeof sec.intro === 'function' ? sec.intro(state) : sec.intro);
+        // patientResponse line text already in sectionLines (since pushed above loop) -- but intro wasn't pushed for discussion
+        sectionLines.forEach(t => discussionLines.push(t));
+
+        // dynamic diagnosis blocks
+        const selections = getDiagnosisSelections();
+        selections.forEach(diagLabel => {
+          const mapping = DIAGNOSIS_DISCUSSION_MAP[diagLabel];
+          if (!mapping) return;
+          const ls = discussionBlockState[diagLabel] || {};
+          const bodyText = mapping.body(ls);
+          discussionLines.push(mapping.tag + ': ' + bodyText);
+        });
+
+        // custom comment lines
+        customTexts.forEach(t => discussionLines.push(t));
+
+        if (discussionLines.length > 0) {
+          noteParts.push(sec.title + '\n' + discussionLines.join(' '));
+        }
+        return;
+      }
+
+      // custom comment lines
+      customTexts.forEach(t => sectionLines.push(t));
+
+      if (sectionLines.length > 0) {
+        noteParts.push(sec.title + '\n' + sectionLines.join(' '));
+      }
+    });
+
+    document.getElementById('note-output').textContent = noteParts.join('\n\n');
+  }
+
+
+  /* ------------------------------------------------------------
+     FULL RENDER / RESET / ACTIONS
+  ------------------------------------------------------------ */
+
+  function renderAll() {
+    const container = document.getElementById('container');
+    container.innerHTML = '';
+    SECTIONS.forEach(sec => {
+      container.appendChild(renderSection(sec));
+    });
+    renderNote();
+    renderSkippedTray();
+  }
+
+  document.getElementById('copy-btn').addEventListener('click', () => {
+    const text = document.getElementById('note-output').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-btn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1200);
+    });
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    initState();
+    Object.keys(discussionBlockState).forEach(k => delete discussionBlockState[k]);
+    renderAll();
+  });
+
+
+  /* ------------------------------------------------------------
+     INIT
+  ------------------------------------------------------------ */
+  initState();
+  renderAll();
+
+})();
+
+</script>
+<nav class="section-footer" id="section-footer" aria-label="Jump to section"></nav>
+
+<script>
+/* ---- Section footer: build links and keep active state on scroll ---- */
+(function() {
+  const SECTION_TITLES = [
+    { id: 'checkin',              label: 'Check-in note' },
+    { id: 'limitedExam',          label: 'Limited exam' },
+    { id: 'socialMedicalDental',  label: 'Social / Medical / Dental History' },
+    { id: 'extraOralExam',        label: 'Extra Oral Exam' },
+    { id: 'intraOralExam',        label: 'Intra Oral Exam' },
+    { id: 'dentalExam',           label: 'Dental Exam' },
+    { id: 'radiographs',          label: 'Radiographs' },
+    { id: 'diagnosis',            label: 'Diagnosis' },
+    { id: 'discussion',           label: 'Discussion' },
+    { id: 'treatmentPlan',        label: 'Treatment Plan' },
+    { id: 'nextVisit',            label: 'Next Visit' },
+  ];
+
+  const footer = document.getElementById('section-footer');
+
+  function buildFooter() {
+    footer.innerHTML = '';
+    SECTION_TITLES.forEach(({ id, label }) => {
+      const btn = document.createElement('button');
+      btn.className = 'footer-link';
+      btn.textContent = label;
+      btn.dataset.sectionId = id;
+
+      const card = document.getElementById('card-' + id);
+      if (card && card.classList.contains('section-skipped')) {
+        btn.classList.add('skipped');
+      }
+
+      btn.addEventListener('click', () => {
+        const target = document.getElementById('card-' + id);
+        if (!target) return;
+        // If skipped, just ignore
+        if (target.classList.contains('section-skipped')) return;
+        const offset = 72; // footer height + a little breathing room
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      });
+
+      footer.appendChild(btn);
+    });
+  }
+
+  function updateActiveLink() {
+    const links = footer.querySelectorAll('.footer-link');
+    const footerHeight = footer.offsetHeight + 80;
+    let activeId = null;
+
+    // Find which section is closest to the top of the viewport
+    let minDist = Infinity;
+    SECTION_TITLES.forEach(({ id }) => {
+      const card = document.getElementById('card-' + id);
+      if (!card || card.classList.contains('section-skipped')) return;
+      const rect = card.getBoundingClientRect();
+      const dist = Math.abs(rect.top - footerHeight);
+      if (rect.top <= footerHeight + 40 && dist < minDist) {
+        minDist = dist;
+        activeId = id;
+      }
+    });
+
+    // Fall back to first visible section
+    if (!activeId) {
+      for (const { id } of SECTION_TITLES) {
+        const card = document.getElementById('card-' + id);
+        if (!card || card.classList.contains('section-skipped')) continue;
+        if (card.getBoundingClientRect().top < window.innerHeight) {
+          activeId = id;
+          break;
+        }
+      }
+    }
+
+    links.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.sectionId === activeId);
+    });
+
+    // Scroll the active link into view within the footer
+    const activeBtn = footer.querySelector('.footer-link.active');
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+    }
+  }
+
+  // Rebuild footer whenever the DOM changes (section skipped/restored)
+  const observer = new MutationObserver(() => {
+    buildFooter();
+    updateActiveLink();
+  });
+  observer.observe(document.getElementById('container'), { childList: true, subtree: false });
+
+  window.addEventListener('scroll', updateActiveLink, { passive: true });
+  window.addEventListener('resize', updateActiveLink, { passive: true });
+
+  // Initial build (sections may not exist yet — wait a tick for engine to render)
+  setTimeout(() => {
+    buildFooter();
+    updateActiveLink();
+  }, 100);
+})();
+</script>
+</body>
+</html>
