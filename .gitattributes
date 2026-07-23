@@ -1,0 +1,7 @@
+# Mark the note-builder pages as generated output.
+# GitHub excludes files marked linguist-generated from its code-search index,
+# collapses them in diffs, and leaves them out of repository language stats.
+# These files ARE generated: they are assembled by build/assemble.py from the
+# reference template plus the per-template sections_NN.js data files.
+
+*.html linguist-generated=true
